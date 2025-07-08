@@ -11,4 +11,9 @@ public class TestRunnerServiceImpl implements TestRunnerService {
     public void run() {
         testService.executeTest();
     }
+
+    @Override
+    public TestService getTestService() {
+        return testService;
+    }
 }

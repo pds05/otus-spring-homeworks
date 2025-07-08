@@ -1,0 +1,5 @@
+Science doesn't know this yet
+ClassLoader#geResourceAsStream or ClassPathResource#getInputStream
+@SneakyThrow%false|e.printStackTrace()
+A bean is an object that is instantiated, assembled, and otherwise managed by a Spring IoC container
+This is a principle in software engineering which transfers the control of objects to a container
