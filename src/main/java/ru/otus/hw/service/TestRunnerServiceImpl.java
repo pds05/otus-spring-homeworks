@@ -1,19 +1,21 @@
 package ru.otus.hw.service;
 
 import lombok.RequiredArgsConstructor;
+import ru.otus.hw.exceptions.QuestionReadException;
 
 @RequiredArgsConstructor
 public class TestRunnerServiceImpl implements TestRunnerService {
 
     private final TestService testService;
 
-    @Override
-    public void run() {
-        testService.executeTest();
-    }
+    private final IOService ioService;
 
     @Override
-    public TestService getTestService() {
-        return testService;
+    public void run() {
+        try {
+            testService.executeTest();
+        } catch (QuestionReadException e) {
+            ioService.printLine("Test failed, question error occurred: " + e.getMessage());
+        }
     }
 }

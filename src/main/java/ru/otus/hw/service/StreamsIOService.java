@@ -1,17 +1,13 @@
 package ru.otus.hw.service;
 
-import ru.otus.hw.exceptions.AnswerReadException;
-
-import java.io.*;
+import java.io.PrintStream;
 
 public class StreamsIOService implements IOService {
     private final PrintStream printStream;
-    private final BufferedReader reader;
 
-    public StreamsIOService(PrintStream printStream, InputStream inputStream) {
+    public StreamsIOService(PrintStream printStream) {
 
         this.printStream = printStream;
-        reader = new BufferedReader(new InputStreamReader(inputStream));
     }
 
     @Override
@@ -22,14 +18,5 @@ public class StreamsIOService implements IOService {
     @Override
     public void printFormattedLine(String s, Object... args) {
         printStream.printf(s + "%n", args);
-    }
-
-    @Override
-    public String readLine() {
-        try {
-            return reader.readLine();
-        } catch (IOException e) {
-            throw new AnswerReadException("Problem reading from stream", e);
-        }
     }
 }
