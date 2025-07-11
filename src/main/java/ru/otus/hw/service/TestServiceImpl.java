@@ -6,7 +6,6 @@ import ru.otus.hw.domain.Answer;
 import ru.otus.hw.domain.Question;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @RequiredArgsConstructor
 public class TestServiceImpl implements TestService {
@@ -25,23 +24,27 @@ public class TestServiceImpl implements TestService {
     }
 
     private void printQuestions(List<Question> questions) {
-        StringBuilder sb = new StringBuilder();
-        AtomicInteger counter = new AtomicInteger(1);
-        questions.forEach(question -> {
-            AtomicInteger ascii = new AtomicInteger(97);
-            sb.append("Question #").append(counter).append(":%n");
-            sb.append(question.text()).append("%n");
-            sb.append("Choice answers:%n");
-            question.answers().forEach(
-                    a -> {
-                        sb.append(Character.toChars(ascii.get()));
-                        sb.append(") %s%n");
-                        ascii.getAndIncrement();
-                    }
-            );
-            ioService.printFormattedLine(sb.toString(), question.answers().stream().map(Answer::text).toArray());
-            sb.setLength(0);
-            counter.getAndIncrement();
-        });
+        for (int i = 0; i < questions.size(); i++) {
+            Question question = questions.get(i);
+            String msg = convertQuestionToString(question, i + 1);
+            ioService.printLine(msg);
+        }
+    }
+
+    private String convertQuestionToString(Question question, Integer index) {
+        StringBuilder sb = new StringBuilder("Question");
+        if (index != null) {
+            sb.append(" #").append(index);
+        }
+        sb.append(":%n");
+        sb.append(question.text()).append("%n");
+        sb.append("Answers:%n");
+        int ascii = 97;
+        for (int j = 0; j < question.answers().size(); j++) {
+            sb.append(Character.toChars(ascii));
+            sb.append(") %s%n");
+            ascii++;
+        }
+        return sb.toString().formatted(question.answers().stream().map(Answer::text).toArray());
     }
 }

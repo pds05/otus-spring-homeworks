@@ -15,7 +15,7 @@ public class TestRunnerServiceImpl implements TestRunnerService {
         try {
             testService.executeTest();
         } catch (QuestionReadException e) {
-            ioService.printLine("Test failed, question error occurred: " + e.getMessage());
+            ioService.printLine("Test failed, question error occurred");
         }
     }
 }

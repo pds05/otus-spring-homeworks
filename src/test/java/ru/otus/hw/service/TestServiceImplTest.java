@@ -1,36 +1,31 @@
-import org.junit.jupiter.api.BeforeEach;
+package ru.otus.hw.service;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.otus.hw.dao.CsvQuestionDao;
 import ru.otus.hw.domain.Answer;
 import ru.otus.hw.domain.Question;
-import ru.otus.hw.service.StreamsIOService;
-import ru.otus.hw.service.TestService;
-import ru.otus.hw.service.TestServiceImpl;
 
 import java.util.Arrays;
 
 @ExtendWith(MockitoExtension.class)
-class AnswerOnQuestionTest {
+class TestServiceImplTest {
 
     @Mock
-    CsvQuestionDao questionDao;
+    private CsvQuestionDao questionDao;
 
     @Mock
-    StreamsIOService ioService;
+    private StreamsIOService ioService;
 
-    private TestService testService;
-
-    @BeforeEach
-    void init() {
-        testService = new TestServiceImpl(ioService, questionDao);
-    }
+    @InjectMocks
+    private TestServiceImpl testServiceImpl;
 
     @Test
-    void startTestRunnerService() {
+    void startTestServiceImpl() {
         Question question1 = new Question("Is there life on Mars?",
                 Arrays.asList(
                         new Answer("Science doesn't know this yet", true),
@@ -45,7 +40,7 @@ class AnswerOnQuestionTest {
         Mockito.when(questionDao.findAll()).thenReturn(Arrays.asList(question1, question2));
         Mockito.doNothing().when(ioService).printLine(Mockito.anyString());
         Mockito.doNothing().when(ioService).printFormattedLine(Mockito.anyString());
-        testService.executeTest();
+        testServiceImpl.executeTest();
         Mockito.verify(questionDao, Mockito.only()).findAll();
     }
 }
