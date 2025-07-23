@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class CsvQuestionDaoTest {
 
     @Mock
-    AppProperties appProperties;
+    private AppProperties appProperties;
 
     @InjectMocks
     private CsvQuestionDao csvQuestionDao;

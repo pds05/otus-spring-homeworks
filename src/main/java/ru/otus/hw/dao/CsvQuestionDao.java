@@ -4,6 +4,7 @@ import com.opencsv.bean.CsvToBeanBuilder;
 import lombok.RequiredArgsConstructor;
 import com.opencsv.bean.FuzzyMappingStrategy;
 import com.opencsv.bean.MappingStrategy;
+import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import ru.otus.hw.config.TestFileNameProvider;
 import ru.otus.hw.dao.dto.QuestionDto;
@@ -16,7 +17,7 @@ import java.io.InputStreamReader;
 import java.util.List;
 
 @RequiredArgsConstructor
-@Service("questionDao")
+@Repository("questionDao")
 public class CsvQuestionDao implements QuestionDao {
     private final TestFileNameProvider fileNameProvider;
 

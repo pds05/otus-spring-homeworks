@@ -31,15 +31,17 @@ public class TestServiceImpl implements TestService {
             String questionForPrint = convertQuestionToString(question, i + 1);
 
             String answer = ioService.readStringWithPrompt(questionForPrint);
-            var isAnswerValid = question.answers().stream()
-                    .filter(a -> a.text().equalsIgnoreCase(answer))
-                    .findFirst()
-                    .orElse(new Answer(answer, false))
-                    .isCorrect();
-
-            testResult.applyAnswer(question, isAnswerValid);
+            testResult.applyAnswer(question, isAnswerValid(answer, question));
         }
         return testResult;
+    }
+
+    private boolean isAnswerValid(String answer, Question question) {
+        return question.answers().stream()
+                .filter(a -> a.text().equalsIgnoreCase(answer))
+                .map(Answer::isCorrect)
+                .findFirst()
+                .orElse(false);
     }
 
     private String convertQuestionToString(Question question, Integer index) {
