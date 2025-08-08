@@ -23,7 +23,7 @@ public class TestServiceImplTest {
     private QuestionDao questionDao;
 
     @Mock
-    private LocalizedIOService ioService;
+    private LocalizedIOServiceImpl ioService;
 
     @InjectMocks
     private TestServiceImpl testServiceImpl;
