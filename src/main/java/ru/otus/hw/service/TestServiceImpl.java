@@ -45,13 +45,13 @@ public class TestServiceImpl implements TestService {
 
     private String convertQuestionToString(Question question, Integer index) {
         StringBuilder sb = new StringBuilder();
-        sb.append(ioService.readPromptLocalized("TestService.info.question"));
+        sb.append(ioService.getMessage("TestService.info.question"));
         if (index != null) {
             sb.append(" #").append(index);
         }
         sb.append(":%n");
         sb.append(question.text()).append("%n");
-        sb.append(ioService.readPromptLocalized("TestService.info.answer")).append("%n");
+        sb.append(ioService.getMessage("TestService.info.answer")).append("%n");
         int ascii = 97;
         for (int j = 0; j < question.answers().size(); j++) {
             sb.append(Character.toChars(ascii));
