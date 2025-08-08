@@ -73,4 +73,8 @@ public class LocalizedIOServiceImpl implements LocalizedIOService {
     public String getMessage(String code, Object... args) {
         return localizedMessagesService.getMessage(code, args);
     }
+
+    public String readPromptLocalized(String promptCode) {
+        return localizedMessagesService.getMessage(promptCode);
+    }
 }

@@ -14,7 +14,7 @@ public class TestRunnerServiceImpl implements TestRunnerService {
 
     private final ResultService resultService;
 
-    private final LocalizedIOService localizedIOService;
+    private final LocalizedIOServiceImpl localizedIOService;
 
     @Override
     public void run() {
@@ -23,9 +23,9 @@ public class TestRunnerServiceImpl implements TestRunnerService {
             var testResult = testService.executeTestFor(student);
             resultService.showResult(testResult);
         } catch (QuestionReadException qre) {
-            localizedIOService.printFormattedLineLocalized("ResultService.error.test", "question error occurred");
+            localizedIOService.readPromptLocalized("ResultService.error.question");
         } catch (Exception e) {
-            localizedIOService.printFormattedLineLocalized("ResultService.error.test", "common error occurred");
+            localizedIOService.readPromptLocalized("ResultService.error.common");
         }
     }
 }

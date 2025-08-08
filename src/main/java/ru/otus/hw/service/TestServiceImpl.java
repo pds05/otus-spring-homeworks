@@ -12,7 +12,7 @@ import ru.otus.hw.domain.TestResult;
 @RequiredArgsConstructor
 public class TestServiceImpl implements TestService {
 
-    private final LocalizedIOService ioService;
+    private final LocalizedIOServiceImpl ioService;
 
     private final QuestionDao questionDao;
 
@@ -44,13 +44,14 @@ public class TestServiceImpl implements TestService {
     }
 
     private String convertQuestionToString(Question question, Integer index) {
-        StringBuilder sb = new StringBuilder("Question");
+        StringBuilder sb = new StringBuilder();
+        sb.append(ioService.readPromptLocalized("TestService.info.question"));
         if (index != null) {
             sb.append(" #").append(index);
         }
         sb.append(":%n");
         sb.append(question.text()).append("%n");
-        sb.append("Answers:%n");
+        sb.append(ioService.readPromptLocalized("TestService.info.answer")).append("%n");
         int ascii = 97;
         for (int j = 0; j < question.answers().size(); j++) {
             sb.append(Character.toChars(ascii));
