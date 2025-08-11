@@ -12,7 +12,7 @@
     </parent>
 
     <groupId>ru.otus.hw</groupId>
-    <artifactId>hw03-spring-boot</artifactId>
+    <artifactId>hw04-spring-boot-test</artifactId>
     <version>1.0</version>
 
     <properties>
@@ -26,6 +26,7 @@
         <checkstyle.config.url>
             https://raw.githubusercontent.com/OtusTeam/Spring/master/checkstyle.xml
         </checkstyle.config.url>
+        <spring-shell.version>3.3.4</spring-shell.version>
     </properties>
     <dependencies>
         <dependency>
@@ -36,6 +37,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.shell</groupId>
+            <artifactId>spring-shell-starter</artifactId>
         </dependency>
 
         <dependency>
@@ -58,6 +64,18 @@
         </dependency>
 
     </dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.shell</groupId>
+                <artifactId>spring-shell-dependencies</artifactId>
+                <version>${spring-shell.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <build>
         <plugins>

@@ -1,11 +1,10 @@
 package ru.otus.hw.dao;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import ru.otus.hw.config.AppProperties;
 import ru.otus.hw.domain.Answer;
 import ru.otus.hw.domain.Question;
@@ -15,13 +14,13 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
 public class CsvQuestionDaoTest {
 
-    @Mock
+    @MockitoBean
     private AppProperties appProperties;
 
-    @InjectMocks
+    @Autowired
     private CsvQuestionDao csvQuestionDao;
 
     @Test
