@@ -1,12 +1,14 @@
 package ru.otus.hw.repositories;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.otus.hw.exceptions.EntityNotFoundException;
@@ -17,7 +19,6 @@ import ru.otus.hw.models.Genre;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Optional;
 import java.util.List;
 import java.util.ArrayList;
@@ -28,21 +29,16 @@ import java.util.HashMap;
 @RequiredArgsConstructor
 public class JdbcBookRepository implements BookRepository {
 
-    private static AuthorRepository authorRepository;
-
     private final JdbcOperations jdbcOperations;
 
-    private final GenreRepository genreRepository;
+    private final NamedParameterJdbcTemplate namedParametersJdbcTemplate;
 
-    @Autowired
-    public void setAuthorRepository(AuthorRepository authorRepository) {
-        JdbcBookRepository.authorRepository = authorRepository;
-    }
+    private final GenreRepository genreRepository;
 
     @Override
     public Optional<Book> findById(long id) {
         return Optional.ofNullable(jdbcOperations.query("select * from books " +
-                "inner join authors on authors.id = books.author_id  " +
+                "join authors on authors.id = books.author_id  " +
                 "left join books_genres on books_genres.book_id = books.id  " +
                 "left join genres on genres.id = books_genres.genre_id  " +
                 "where books.id = ?", new BookResultSetExtractor(), id));
@@ -71,7 +67,19 @@ public class JdbcBookRepository implements BookRepository {
     }
 
     private List<Book> getAllBooksWithoutGenres() {
-        return jdbcOperations.query("select * from books", new BookRowMapper());
+        return jdbcOperations.query("select * from books " +
+                "join authors on authors.id = books.author_id", (rs, i) -> {
+            Book book = new Book();
+            book.setId(rs.getLong("id"));
+            book.setTitle(rs.getString("title"));
+
+            Author author = new Author();
+            author.setId(rs.getLong("author_id"));
+            author.setFullName(rs.getString("full_name"));
+
+            book.setAuthor(author);
+            return book;
+        });
     }
 
     private List<BookGenreRelation> getAllGenreRelations() {
@@ -98,13 +106,15 @@ public class JdbcBookRepository implements BookRepository {
     private Book insert(Book book) {
         var keyHolder = new GeneratedKeyHolder();
 
-        jdbcOperations.update(con -> {
-            PreparedStatement ps = con.prepareStatement("insert into books (title, author_id) values (?,?)",
-                    Statement.RETURN_GENERATED_KEYS);
-            ps.setString(1, book.getTitle());
-            ps.setLong(2, book.getAuthor().getId());
-            return ps;
-        }, keyHolder);
+        SqlParameterSource namedParameters = new MapSqlParameterSource()
+                .addValue("title", book.getTitle())
+                .addValue("author_id", book.getAuthor().getId());
+
+        int inserted = namedParametersJdbcTemplate.update("insert into books (title, author_id) " +
+                "values (:title, :author_id)", namedParameters, keyHolder);
+        if (inserted == 0) {
+            throw new EntityNotFoundException("Book " + book + " not inserted");
+        }
 
         book.setId(keyHolder.getKeyAs(Long.class));
 
@@ -113,13 +123,17 @@ public class JdbcBookRepository implements BookRepository {
     }
 
     private Book update(Book book) {
-        int updated = jdbcOperations.update("update books set title = ?, author_id = ? where id =? ",
-                book.getTitle(),
-                book.getAuthor().getId(),
-                book.getId());
+        SqlParameterSource namedParameters = new MapSqlParameterSource()
+                .addValue("title", book.getTitle())
+                .addValue("authorId", book.getAuthor().getId())
+                .addValue("id", book.getId());
+
+        int updated = namedParametersJdbcTemplate.update("update books set title = :title, author_id = :authorId " +
+                "where id = :id", namedParameters);
         if (updated == 0) {
             throw new EntityNotFoundException("Book with id " + book.getId() + " not updated");
         }
+
         removeGenresRelationsFor(book);
         batchInsertGenresRelationsFor(book);
 
@@ -150,14 +164,13 @@ public class JdbcBookRepository implements BookRepository {
         @Override
         public Book mapRow(ResultSet rs, int rowNum) throws SQLException {
             Book book = new Book();
-
             book.setId(rs.getLong("id"));
             book.setTitle(rs.getString("title"));
 
-            Author author = authorRepository.findById(rs.getInt("author_id"))
-                    .orElseThrow(() -> new EntityNotFoundException("Author not found"));
-            book.setAuthor(author);
+            Author author = new Author();
+            author.setId(rs.getLong("author_id"));
 
+            book.setAuthor(author);
             return book;
         }
     }
