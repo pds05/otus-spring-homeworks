@@ -24,13 +24,13 @@ public class JdbcGenreRepository implements GenreRepository {
 
     @Override
     public List<Genre> findAll() {
-        return jdbcOperations.query("select * from genres", new GnreRowMapper());
+        return jdbcOperations.query("select id, name from genres", new GnreRowMapper());
     }
 
     @Override
     public List<Genre> findAllByIds(Set<Long> ids) {
         SqlParameterSource namedParameters = new MapSqlParameterSource("ids", ids);
-        return namedParameterJdbcTemplate.query("select * from genres where id in (:ids)",
+        return namedParameterJdbcTemplate.query("select id, name from genres where id in (:ids)",
                 namedParameters, new GnreRowMapper());
     }
 

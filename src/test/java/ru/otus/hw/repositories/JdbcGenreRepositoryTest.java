@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Import;
 import ru.otus.hw.models.Genre;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -32,12 +33,24 @@ public class JdbcGenreRepositoryTest {
 
     @DisplayName("должен загружать список всех жанров книг")
     @Test
-    void shouldReturnCorrectAuthorList() {
+    void shouldReturnCorrectGenreList() {
         var actualGenres = repositoryJdbc.findAll();
         var expectedAuthors = dbGenres;
 
         assertThat(dbGenres).containsExactlyElementsOf(expectedAuthors);
         actualGenres.forEach(System.out::println);
+    }
+
+    @DisplayName("должен загружать список жанров по списку идентификаторов")
+    @Test
+    void shouldReturnGenresByIdsList() {
+        Set<Long> expectedIds = Set.of(2L, 4L, 6L);
+
+        var returnedGenres = repositoryJdbc.findAllByIds(expectedIds);
+
+        assertThat(returnedGenres.size()).isEqualTo(expectedIds.size());
+        assertThat(returnedGenres).allMatch(genre -> expectedIds.contains(genre.getId()));
+        returnedGenres.forEach(System.out::println);
     }
 
     private static List<Genre> getDbGenres() {

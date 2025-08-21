@@ -13,7 +13,7 @@ import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DisplayName("Репозиторий на основе Jdbc для работы с авторами ")
+@DisplayName("Репозиторий на основе Jdbc для работы с авторами")
 @JdbcTest
 @Import(JdbcAuthorRepository.class)
 public class JdbcAuthorRepositoryTest {
