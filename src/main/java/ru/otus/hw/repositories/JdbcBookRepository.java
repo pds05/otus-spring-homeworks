@@ -41,8 +41,8 @@ public class JdbcBookRepository implements BookRepository {
                 "select b.id, b.title, b.author_id, a.full_name, bg.genre_id, g.name " +
                         "from books b " +
                         "join authors a on a.id = b.author_id  " +
-                        "left join books_genres bg on bg.book_id = b.id  " +
-                        "left join genres g on g.id = bg.genre_id  " +
+                        "join books_genres bg on bg.book_id = b.id  " +
+                        "join genres g on g.id = bg.genre_id  " +
                         "where b.id = :id",
                 Collections.singletonMap("id", id), new BookResultSetExtractor()));
     }
@@ -89,21 +89,12 @@ public class JdbcBookRepository implements BookRepository {
         Map<Long, Book> bookMap = booksWithoutGenres.stream().collect(Collectors.toMap(Book::getId, b -> b));
 
         Map<Long, List<Genre>> relationMap = relations.stream().collect(Collectors.groupingBy(
-                relation -> relation.bookId, Collectors.mapping(relation -> {
-                    if (genreMap.containsKey(relation.genreId)) {
-                        return genreMap.get(relation.genreId);
-                    } else {
-                        throw new EntityNotFoundException("Genre with id " + relation.genreId + " not found");
-                    }
-                }, Collectors.toList())));
+                relation -> relation.bookId,
+                Collectors.mapping(relation -> genreMap.get(relation.genreId), Collectors.toList())));
 
         relationMap.forEach((bookId, genreList) -> {
-            if (bookMap.containsKey(bookId)) {
-                Book book = bookMap.get(bookId);
-                book.setGenres(genreList);
-            } else {
-                throw new EntityNotFoundException("Book with id " + bookId + " not found");
-            }
+            Book book = bookMap.get(bookId);
+            book.setGenres(genreList);
         });
     }
 
@@ -157,7 +148,8 @@ public class JdbcBookRepository implements BookRepository {
     }
 
     private void removeGenresRelationsFor(Book book) {
-        jdbcOperations.update("delete from books_genres where book_id = ?", book.getId());
+        namedParametersJdbcTemplate.update("delete from books_genres where book_id = :id",
+                Collections.singletonMap("id", book.getId()));
     }
 
     private static class BookRowMapper implements RowMapper<Book> {
