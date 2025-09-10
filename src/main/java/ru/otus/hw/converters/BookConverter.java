@@ -13,15 +13,23 @@ public class BookConverter {
 
     private final GenreConverter genreConverter;
 
+    private final UserCommentConverter userCommentConverter;
+
     public String bookToString(Book book) {
         var genresString = book.getGenres().stream()
                 .map(genreConverter::genreToString)
                 .map("{%s}"::formatted)
                 .collect(Collectors.joining(", "));
-        return "Id: %d, title: %s, author: {%s}, genres: [%s]".formatted(
+        var commentsString = book.getUserComments().stream()
+                .map(userCommentConverter::userCommentToString)
+                .map("{%s}"::formatted)
+                .collect(Collectors.joining(","));
+        return "Id: %d, title: %s, author: {%s}, genres: [%s], comments: [%s]".formatted(
                 book.getId(),
                 book.getTitle(),
                 authorConverter.authorToString(book.getAuthor()),
-                genresString);
+                genresString,
+                commentsString);
     }
+
 }

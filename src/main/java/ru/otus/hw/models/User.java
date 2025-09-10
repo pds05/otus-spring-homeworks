@@ -8,8 +8,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Column;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GenerationType;
+import jakarta.persistence.FetchType;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.EqualsAndHashCode;
@@ -23,24 +24,23 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString(exclude = "books")
-@EqualsAndHashCode(exclude = "books")
+@ToString(exclude = "userComments")
+@EqualsAndHashCode(exclude = "userComments")
 
 @Entity
-@Table(name = "authors")
+@Table(name = "users")
 @NamedEntityGraph(
-        name = "author-entity-graph",
-        attributeNodes = @NamedAttributeNode("books")
+        name = "user-entity-graph",
+        attributeNodes = @NamedAttributeNode("userComments")
 )
-public class Author {
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name = "full_name")
-    private String fullName;
+    @Column(name = "user_name")
+    private String userName;
 
-    @OneToMany(mappedBy = "author", fetch = FetchType.LAZY)
-    private List<Book> books;
-
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<UserComment> userComments;
 }

@@ -1,6 +1,9 @@
 insert into authors(full_name)
 values ('Author_1'), ('Author_2'), ('Author_3');
 
+insert into users(user_name)
+values ('User_1'), ('User_2'), ('User_3');
+
 insert into genres(name)
 values ('Genre_1'), ('Genre_2'), ('Genre_3'),
        ('Genre_4'), ('Genre_5'), ('Genre_6');
