@@ -62,7 +62,7 @@ public class UserCommentRepositoryTest {
         User user1 = entityManager.find(User.class, 1L);
         Book book1 = entityManager.find(Book.class, 1L);
         UserComment expectedComment = createUserComment(user1, book1);
-        UserComment returnedComment = jpaUserCommentRepository.save(expectedComment);
+        var returnedComment = entityManager.persist(expectedComment);
 
         assertThat(returnedComment)
                 .isNotNull().matches(comment -> comment.getId() > 0)
@@ -83,14 +83,15 @@ public class UserCommentRepositoryTest {
     void shouldDeleteUserComment() {
         User user = entityManager.find(User.class, 1L);
         Book book = entityManager.find(Book.class, 1L);
+
         UserComment userComment = createUserComment(user, book);
-        jpaUserCommentRepository.save(userComment);
+        entityManager.persist(userComment);
 
         assertThat(userComment).matches(comment -> comment.getId() > 0);
 
         jpaUserCommentRepository.deleteById(userComment.getId());
 
-        assertThat(jpaUserCommentRepository.getUserCommentById(userComment.getId())).isEmpty();
+        assertThat(entityManager.find(UserComment.class, userComment.getId())).isNull();
 
     }
 

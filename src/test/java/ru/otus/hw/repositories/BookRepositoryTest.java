@@ -9,6 +9,7 @@ import ru.otus.hw.models.Author;
 import ru.otus.hw.models.Book;
 import ru.otus.hw.models.Genre;
 
+import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -17,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DataJpaTest
 class BookRepositoryTest {
 
-    public static final int FIRST_BOOK_ID = 1;
+    public static final long FIRST_BOOK_ID = 1;
 
     @Autowired
     private BookRepository bookRepository;
@@ -51,15 +52,13 @@ class BookRepositoryTest {
         var author = entityManager.find(Author.class, 3);
         var genre3 = entityManager.find(Genre.class, 3);
         var genre6 = entityManager.find(Genre.class, 6);
-        var expectedBook = new Book(0, "BookTitle_10500", author, List.of(genre3, genre6), null);
+        var expectedBook = new Book(0, "BookTitle_10500", author, List.of(genre3, genre6), Collections.emptySet());
         var returnedBook = bookRepository.save(expectedBook);
         assertThat(returnedBook).isNotNull()
                 .matches(book -> book.getId() > 0)
                 .usingRecursiveComparison().ignoringExpectedNullFields().isEqualTo(expectedBook);
 
-        assertThat(bookRepository.findById(returnedBook.getId()))
-                .isPresent()
-                .get()
+        assertThat(entityManager.find(Book.class, returnedBook.getId()))
                 .isEqualTo(returnedBook);
 
         System.out.println(returnedBook);
@@ -71,12 +70,10 @@ class BookRepositoryTest {
         var author = entityManager.find(Author.class, 3);
         var genre2 = entityManager.find(Genre.class, 2);
         var genre4 = entityManager.find(Genre.class, 4);
-        var expectedBook = new Book(1L, "BookTitle_10500", author,
-                List.of(genre2, genre4), null);
+        var expectedBook = new Book(FIRST_BOOK_ID, "BookTitle_10500", author,
+                List.of(genre2, genre4), Collections.emptySet());
 
-        assertThat(bookRepository.findById(expectedBook.getId()))
-                .isPresent()
-                .get()
+        assertThat(entityManager.find(Book.class, expectedBook.getId()))
                 .isNotEqualTo(expectedBook);
 
         var returnedBook = bookRepository.save(expectedBook);
@@ -84,9 +81,7 @@ class BookRepositoryTest {
                 .matches(book -> book.getId() > 0)
                 .usingRecursiveComparison().ignoringExpectedNullFields().isEqualTo(expectedBook);
 
-        assertThat(bookRepository.findById(returnedBook.getId()))
-                .isPresent()
-                .get()
+        assertThat(entityManager.find(Book.class, returnedBook.getId()))
                 .isEqualTo(returnedBook);
 
         System.out.println(returnedBook);
@@ -95,9 +90,9 @@ class BookRepositoryTest {
     @DisplayName("должен удалять книгу по id ")
     @Test
     void shouldDeleteBook() {
-        assertThat(bookRepository.findById(1L)).isPresent();
-        bookRepository.deleteById(1L);
-        assertThat(bookRepository.findById(1L)).isEmpty();
+        assertThat(entityManager.find(Book.class, FIRST_BOOK_ID)).isNotNull();
+        bookRepository.deleteById(FIRST_BOOK_ID);
+        assertThat(entityManager.find(Book.class, FIRST_BOOK_ID)).isNull();
     }
 
 }

@@ -13,7 +13,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DataJpaTest
 public class UserRepositoryTest {
 
-    public static final int FIRST_USER_ID = 1;
+    public static final long FIRST_USER_ID = 1;
     public static final String FIRST_USER_USERNAME = "User_1";
 
     @Autowired
@@ -49,5 +49,25 @@ public class UserRepositoryTest {
 
         assertThat(optionalUser).isPresent().get().isEqualTo(expectedUser);
         System.out.println(optionalUser.get());
+    }
+
+    @DisplayName("должен сохранять нового читателя")
+    @Test
+    void shouldCreateNewUser() {
+        User user = new User();
+        user.setUserName("New User");
+
+        var savedUser = userRepository.save(user);
+        assertThat(savedUser.getId()).isGreaterThan(0);
+        assertThat(savedUser.getUserName()).isEqualTo(user.getUserName());
+
+    }
+
+    @DisplayName("должен удалять читателя по его id")
+    @Test
+    void shouldDeleteUser() {
+        userRepository.deleteById(FIRST_USER_ID);
+        assertThat(entityManager.find(User.class, FIRST_USER_ID)).isNull();
+
     }
 }
