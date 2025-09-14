@@ -5,21 +5,19 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.context.annotation.Import;
 import ru.otus.hw.models.User;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("Репозиторий на основе Jpa для работы с читателями книг")
 @DataJpaTest
-@Import({JpaUserRepository.class})
-public class JpaUserRepositoryTest {
+public class UserRepositoryTest {
 
     public static final int FIRST_USER_ID = 1;
     public static final String FIRST_USER_USERNAME = "User_1";
 
     @Autowired
-    private JpaUserRepository userRepository;
+    private UserRepository userRepository;
 
     @Autowired
     private TestEntityManager entityManager;
@@ -46,7 +44,7 @@ public class JpaUserRepositoryTest {
     @DisplayName("должен загружать читателя по его username")
     @Test
     void shouldReturnAuthorByUsername() {
-        var optionalUser = userRepository.findByUsername(FIRST_USER_USERNAME);
+        var optionalUser = userRepository.findByUserName(FIRST_USER_USERNAME);
         var expectedUser = entityManager.find(User.class, FIRST_USER_ID);
 
         assertThat(optionalUser).isPresent().get().isEqualTo(expectedUser);

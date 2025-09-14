@@ -1,12 +1,19 @@
 package ru.otus.hw.repositories;
 
+import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 import ru.otus.hw.models.Author;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface AuthorRepository {
+@Repository
+public interface AuthorRepository extends JpaRepository<Author, Long> {
+
+    @EntityGraph("author-entity-graph")
     List<Author> findAll();
 
+    @EntityGraph("author-entity-graph")
     Optional<Author> findById(long id);
 }

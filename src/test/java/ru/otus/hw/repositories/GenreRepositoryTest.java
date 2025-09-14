@@ -11,17 +11,16 @@ import ru.otus.hw.models.Genre;
 
 import java.util.List;
 import java.util.Set;
-import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("Репозиторий на основе Jpa для работы с жанрами книг")
 @DataJpaTest
-@Import(JpaGenreRepository.class)
-public class JpaGenreRepositoryTest {
+//@Import(GenreRepository.class)
+public class GenreRepositoryTest {
 
     @Autowired
-    private JpaGenreRepository genreRepository;
+    private GenreRepository genreRepository;
 
     @Autowired
     private TestEntityManager entityManager;

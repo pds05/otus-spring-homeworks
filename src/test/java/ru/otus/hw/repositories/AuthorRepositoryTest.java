@@ -5,20 +5,18 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.context.annotation.Import;
 import ru.otus.hw.models.Author;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("Репозиторий на основе Jpa для работы с авторами")
 @DataJpaTest
-@Import(JpaAuthorRepository.class)
-public class JpaAuthorRepositoryTest {
+public class AuthorRepositoryTest {
 
-    public static final int FIRST_AUTHOR_ID = 1;
+    public static final long FIRST_AUTHOR_ID = 1L;
 
     @Autowired
-    private JpaAuthorRepository authorRepository;
+    private AuthorRepository authorRepository;
 
     @Autowired
     private TestEntityManager entityManager;

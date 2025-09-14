@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.context.annotation.Import;
 import ru.otus.hw.models.*;
 
 import java.util.List;
@@ -14,11 +13,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("Репозиторий на основе Jpa для работы с комментариями книг")
 @DataJpaTest
-@Import({JpaUserCommentRepository.class})
-public class JpaUserCommentRepositoryTest {
+public class UserCommentRepositoryTest {
 
     @Autowired
-    private JpaUserCommentRepository jpaUserCommentRepository;
+    private UserCommentRepository jpaUserCommentRepository;
 
     @Autowired
     private TestEntityManager entityManager;
