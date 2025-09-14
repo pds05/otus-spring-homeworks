@@ -9,8 +9,6 @@ public interface UserCommentRepository {
 
     Optional<UserComment> getUserCommentById(long id);
 
-    List<UserComment> getAllUserCommentsByUserId(long userId);
-
     List<UserComment> getAllUserCommentsByBookId(long bookId);
 
     UserComment save(UserComment userComment);

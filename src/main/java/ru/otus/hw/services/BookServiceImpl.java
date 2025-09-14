@@ -9,7 +9,6 @@ import ru.otus.hw.repositories.AuthorRepository;
 import ru.otus.hw.repositories.BookRepository;
 import ru.otus.hw.repositories.GenreRepository;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -25,14 +24,22 @@ public class BookServiceImpl implements BookService {
 
     private final BookRepository bookRepository;
 
+    @Transactional
     @Override
     public Optional<Book> findById(long id) {
-        return bookRepository.findById(id);
+        Optional<Book> book = bookRepository.findById(id);
+        book.ifPresent(b -> b.getGenres().size());
+        return book;
     }
 
+    @Transactional
     @Override
     public List<Book> findAll() {
-        return bookRepository.findAll();
+        List<Book> result = bookRepository.findAll();
+        if (!isEmpty(result)) {
+            result.get(0).getGenres().size();
+        }
+        return result;
     }
 
     @Transactional
@@ -65,7 +72,7 @@ public class BookServiceImpl implements BookService {
             throw new EntityNotFoundException("One or all genres with ids %s not found".formatted(genresIds));
         }
 
-        var book = new Book(id, title, author, genres, Collections.emptySet());
+        var book = new Book(id, title, author, genres);
         return bookRepository.save(book);
     }
 }

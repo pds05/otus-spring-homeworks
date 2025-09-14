@@ -5,6 +5,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import ru.otus.hw.models.Book;
 import ru.otus.hw.models.UserComment;
 
 import java.util.HashMap;
@@ -30,20 +31,10 @@ public class JpaUserCommentRepository implements UserCommentRepository {
     }
 
     @Override
-    public List<UserComment> getAllUserCommentsByUserId(long userId) {
-        EntityGraph<?> entityGraph = em.getEntityGraph("user-comment-entity-graph");
-        return em.createQuery("select uc from UserComment uc where uc.user.id = :userId", UserComment.class)
-                .setParameter("userId", userId)
-                .setHint("javax.persistence.fetchgraph", entityGraph)
-                .getResultList();
-    }
-
-    @Override
     public List<UserComment> getAllUserCommentsByBookId(long bookId) {
-        EntityGraph<?> entityGraph = em.getEntityGraph("user-comment-entity-graph");
+        em.find(Book.class, bookId);
         return em.createQuery("select uc from UserComment uc where uc.book.id = :bookId", UserComment.class)
                 .setParameter("bookId", bookId)
-                .setHint("javax.persistence.fetchgraph", entityGraph)
                 .getResultList();
     }
 

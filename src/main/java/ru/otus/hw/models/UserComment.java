@@ -23,17 +23,14 @@ import lombok.ToString;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString(exclude = {"user", "book"})
-@EqualsAndHashCode(exclude = {"user", "book"})
+@ToString(exclude = "book")
+@EqualsAndHashCode(exclude = "book")
 
 @Entity
 @Table(name = "user_comments")
 @NamedEntityGraph(
         name = "user-comment-entity-graph",
-        attributeNodes = {
-                @NamedAttributeNode("user"),
-                @NamedAttributeNode("book")
-        }
+        attributeNodes = @NamedAttributeNode("book")
 )
 public class UserComment {
     @Id
@@ -42,10 +39,6 @@ public class UserComment {
 
     @Column(name = "text")
     private String text;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "book_id", nullable = false)

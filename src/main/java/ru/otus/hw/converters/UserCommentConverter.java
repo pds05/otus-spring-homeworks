@@ -7,9 +7,8 @@ import ru.otus.hw.models.UserComment;
 public class UserCommentConverter {
 
     public String userCommentToString(UserComment userComment) {
-        return "Id: %d, User: %s, Book: %s, Text: %s".formatted(
+        return "Id: %d, Book: %s, Text: %s".formatted(
                 userComment.getId(),
-                userComment.getUser().getUserName(),
                 userComment.getBook().getTitle(),
                 userComment.getText());
     }

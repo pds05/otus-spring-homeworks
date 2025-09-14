@@ -1,15 +1,12 @@
 package ru.otus.hw.repositories;
 
-import jakarta.persistence.EntityGraph;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import ru.otus.hw.models.Book;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @Repository
@@ -21,19 +18,12 @@ public class JpaBookRepository implements BookRepository {
 
     @Override
     public Optional<Book> findById(long id) {
-        EntityGraph<?> entityGraph = em.getEntityGraph("book-entity-graph");
-
-        Map<String, Object> properties = new HashMap<>();
-        properties.put("jakarta.persistence.fetchgraph", entityGraph);
-
-        return Optional.ofNullable(em.find(Book.class, id, properties));
+         return Optional.ofNullable(em.find(Book.class, id));
     }
 
     @Override
     public List<Book> findAll() {
-        EntityGraph<?> entityGraph = em.getEntityGraph("book-entity-graph");
         return em.createQuery("select b from Book b", Book.class)
-                .setHint("jakarta.persistence.fetchgraph", entityGraph)
                 .getResultList();
     }
 

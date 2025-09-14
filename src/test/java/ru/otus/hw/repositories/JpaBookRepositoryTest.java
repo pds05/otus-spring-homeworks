@@ -10,7 +10,6 @@ import ru.otus.hw.models.Author;
 import ru.otus.hw.models.Book;
 import ru.otus.hw.models.Genre;
 
-import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -54,7 +53,7 @@ class JpaBookRepositoryTest {
         var author = entityManager.find(Author.class, 3);
         var genre3 = entityManager.find(Genre.class, 3);
         var genre6 = entityManager.find(Genre.class, 6);
-        var expectedBook = new Book(0, "BookTitle_10500", author, List.of(genre3, genre6), Collections.emptySet());
+        var expectedBook = new Book(0, "BookTitle_10500", author, List.of(genre3, genre6));
         var returnedBook = bookRepository.save(expectedBook);
         assertThat(returnedBook).isNotNull()
                 .matches(book -> book.getId() > 0)
@@ -72,7 +71,7 @@ class JpaBookRepositoryTest {
         var genre2 = entityManager.find(Genre.class, 2);
         var genre4 = entityManager.find(Genre.class, 4);
         var expectedBook = new Book(FIRST_BOOK_ID, "BookTitle_10500", author,
-                List.of(genre2, genre4), Collections.emptySet());
+                List.of(genre2, genre4));
         assertThat(entityManager.find(Book.class, expectedBook.getId())).isNotEqualTo(expectedBook);
 
         var returnedBook = bookRepository.save(expectedBook);

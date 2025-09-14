@@ -2,36 +2,21 @@ package ru.otus.hw.models;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import jakarta.persistence.NamedEntityGraph;
-import jakarta.persistence.NamedAttributeNode;
 import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Column;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GenerationType;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.EqualsAndHashCode;
+
+import lombok.Data;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
-import java.util.List;
-
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString(exclude = "books")
-@EqualsAndHashCode(exclude = "books")
 
 @Entity
 @Table(name = "authors")
-@NamedEntityGraph(
-        name = "author-entity-graph",
-        attributeNodes = @NamedAttributeNode("books")
-)
 public class Author {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,8 +24,5 @@ public class Author {
 
     @Column(name = "full_name")
     private String fullName;
-
-    @OneToMany(mappedBy = "author", fetch = FetchType.LAZY)
-    private List<Book> books;
 
 }
