@@ -59,10 +59,7 @@ public class JpaUserCommentRepository implements UserCommentRepository {
 
     @Override
     public void deleteById(long id) {
-        em.createQuery("delete from UserComment where id = :id")
-                .setParameter("id", id)
-                .executeUpdate();
         UserComment userComment = em.find(UserComment.class, id);
-        em.detach(userComment);
+        em.remove(userComment);
     }
 }

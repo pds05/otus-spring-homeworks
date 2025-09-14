@@ -7,9 +7,10 @@ import jakarta.persistence.NamedAttributeNode;
 import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Column;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.NamedSubgraph;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -31,7 +32,12 @@ import java.util.List;
 @Table(name = "users")
 @NamedEntityGraph(
         name = "user-entity-graph",
-        attributeNodes = @NamedAttributeNode("userComments")
+        attributeNodes = @NamedAttributeNode(value = "userComments",
+                subgraph = "user-user-comments-entity-graph"),
+        subgraphs = @NamedSubgraph(name = "user-user-comments-entity-graph",
+                attributeNodes = {
+                        @NamedAttributeNode("user"),
+                        @NamedAttributeNode("book")})
 )
 public class User {
     @Id

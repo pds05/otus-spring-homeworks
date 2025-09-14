@@ -104,5 +104,4 @@ public class JpaUserCommentRepositoryTest {
         return comment;
     }
 
-
 }

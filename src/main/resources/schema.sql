@@ -33,7 +33,7 @@ create table users (
 create table user_comments (
     id      bigserial,
     text    varchar(255),
-    user_id bigint,
-    book_id bigint,
+    user_id bigint references users (id) on delete cascade,
+    book_id bigint references books (id) on delete cascade,
     primary key (user_id, book_id)
 );
