@@ -60,10 +60,7 @@ class JpaBookRepositoryTest {
                 .matches(book -> book.getId() > 0)
                 .usingRecursiveComparison().ignoringExpectedNullFields().isEqualTo(expectedBook);
 
-        assertThat(bookRepository.findById(returnedBook.getId()))
-                .isPresent()
-                .get()
-                .isEqualTo(returnedBook);
+        assertThat(entityManager.find(Book.class, returnedBook.getId())).isEqualTo(expectedBook);
 
         System.out.println(returnedBook);
     }
@@ -74,8 +71,8 @@ class JpaBookRepositoryTest {
         var author = entityManager.find(Author.class, 3);
         var genre2 = entityManager.find(Genre.class, 2);
         var genre4 = entityManager.find(Genre.class, 4);
-        var expectedBook = new Book(1L, "BookTitle_10500", author,
-                List.of(genre2, genre4), null);
+        var expectedBook = new Book(FIRST_BOOK_ID, "BookTitle_10500", author,
+                List.of(genre2, genre4), Collections.emptySet());
         assertThat(entityManager.find(Book.class, expectedBook.getId())).isNotEqualTo(expectedBook);
 
         var returnedBook = bookRepository.save(expectedBook);
@@ -92,9 +89,9 @@ class JpaBookRepositoryTest {
     @DisplayName("должен удалять книгу по id ")
     @Test
     void shouldDeleteBook() {
-        assertThat(bookRepository.findById(1L)).isPresent();
-        bookRepository.deleteById(1L);
-        assertThat(bookRepository.findById(1L)).isEmpty();
+        assertThat(entityManager.find(Book.class, FIRST_BOOK_ID)).isNotNull();
+        bookRepository.deleteById(FIRST_BOOK_ID);
+        assertThat(entityManager.find(Book.class, FIRST_BOOK_ID)).isNull();
     }
 
 }

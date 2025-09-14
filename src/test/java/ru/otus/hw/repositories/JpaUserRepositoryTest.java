@@ -68,6 +68,7 @@ public class JpaUserRepositoryTest {
     @DisplayName("должен удалять читателя по его id")
     @Test
     void shouldDeleteUser() {
+        assertThat(entityManager.find(User.class, FIRST_USER_ID)).isNotNull();
         userRepository.deleteById(FIRST_USER_ID);
         assertThat(entityManager.find(User.class, FIRST_USER_ID)).isNull();
 

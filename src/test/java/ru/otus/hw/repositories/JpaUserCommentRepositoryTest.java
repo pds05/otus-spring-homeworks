@@ -64,7 +64,7 @@ public class JpaUserCommentRepositoryTest {
         User user1 = entityManager.find(User.class, 1L);
         Book book1 = entityManager.find(Book.class, 1L);
         UserComment expectedComment = createUserComment(user1, book1);
-        UserComment returnedComment = jpaUserCommentRepository.save(expectedComment);
+        UserComment returnedComment = entityManager.persist(expectedComment);
 
         assertThat(returnedComment)
                 .isNotNull().matches(comment -> comment.getId() > 0)
@@ -74,7 +74,7 @@ public class JpaUserCommentRepositoryTest {
         returnedComment.setText(updatedUserCommentText);
         jpaUserCommentRepository.save(returnedComment);
 
-        UserComment actualUserComment = entityManager.find(UserComment.class, 1L);
+        UserComment actualUserComment = entityManager.find(UserComment.class, returnedComment.getId());
         assertThat(actualUserComment).usingRecursiveComparison().isEqualTo(returnedComment);
         assertThat(actualUserComment.getText()).isEqualTo(updatedUserCommentText);
 
@@ -86,13 +86,13 @@ public class JpaUserCommentRepositoryTest {
         User user = entityManager.find(User.class, 1L);
         Book book = entityManager.find(Book.class, 1L);
         UserComment userComment = createUserComment(user, book);
-        jpaUserCommentRepository.save(userComment);
+        entityManager.persist(userComment);
 
         assertThat(userComment).matches(comment -> comment.getId() > 0);
 
         jpaUserCommentRepository.deleteById(userComment.getId());
 
-        assertThat(jpaUserCommentRepository.getUserCommentById(userComment.getId())).isEmpty();
+        assertThat(entityManager.find(UserComment.class, userComment.getId())).isNull();
 
     }
 
