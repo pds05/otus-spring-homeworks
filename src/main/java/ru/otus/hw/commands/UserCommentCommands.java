@@ -19,13 +19,13 @@ public class UserCommentCommands {
     @ShellMethod(value = "Save new user comment for the book", key = "ucins")
     public String insertUserComment(long bookId, String comment) {
         var savedUserComment = userCommentService.insert(comment, bookId);
-        return userCommentConverter.userCommentToString(savedUserComment);
+        return userCommentConverter.userCommentDtoToString(savedUserComment);
     }
 
     @ShellMethod(value = "Update user comment by id", key = "ucupd")
     public String updateUserComment(long userCommentId, String comment) {
         var savedUserComment = userCommentService.update(userCommentId, comment);
-        return userCommentConverter.userCommentToString(savedUserComment);
+        return userCommentConverter.userCommentDtoToString(savedUserComment);
     }
 
     @ShellMethod(value = "Delete user comment by id", key = "ucdel")
@@ -36,8 +36,13 @@ public class UserCommentCommands {
     @ShellMethod(value = "Find all user comments by book id", key = "aucbbid")
     public String findAllUserCommentsByBookId(long bookId) {
         return userCommentService.findAllByBookId(bookId).stream()
-                .map(userCommentConverter::userCommentToString)
+                .map(userCommentConverter::userCommentDtoToString)
                 .collect(Collectors.joining("," + System.lineSeparator()));
+    }
+
+    @ShellMethod(value = "Find user comment by id", key = "ucbid")
+    public String findUserCommentById(long userCommentId) {
+        return userCommentConverter.userCommentDtoToString(userCommentService.findById(userCommentId));
     }
 
 }
