@@ -4,6 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 import ru.otus.hw.converters.UserCommentConverter;
 import ru.otus.hw.dtos.UserCommentDto;
 import ru.otus.hw.exceptions.EntityNotFoundException;
@@ -22,6 +23,7 @@ public class UserCommentServiceTest {
     @Autowired
     private UserCommentConverter userCommentConverter;
 
+    @Transactional
     @Test
     @DisplayName("должен добавлять новый комментарий к книге")
     void shouldInsertUserComment() {
@@ -34,6 +36,7 @@ public class UserCommentServiceTest {
 
     }
 
+    @Transactional
     @Test
     @DisplayName("должен вернуть комментарий по его идентификатору")
     void shouldInsertAndReturnUserCommentById() {
@@ -47,6 +50,7 @@ public class UserCommentServiceTest {
 
     }
 
+    @Transactional
     @Test
     @DisplayName("должен вернуть все комментарии к книге")
     void shouldReturnUserCommentsByBookId() {
@@ -61,6 +65,7 @@ public class UserCommentServiceTest {
 
     }
 
+    @Transactional
     @Test
     @DisplayName("должен изменить комментарий к книге")
     void shouldUpdateUserComment() {
@@ -75,6 +80,7 @@ public class UserCommentServiceTest {
 
     }
 
+    @Transactional
     @Test
     @DisplayName("должен удалять комментарий по его идентификатору")
     void shouldDeleteUserComment() {

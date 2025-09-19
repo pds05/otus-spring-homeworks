@@ -7,6 +7,9 @@ spring:
       ddl-auto: none
     database-platform: org.hibernate.dialect.H2Dialect
 #    defer-datasource-initialization: true
+  shell:
+    interactive:
+      enabled: false
   sql:
     init:
       mode: always
