@@ -6,6 +6,7 @@ import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import ru.otus.hw.models.Book;
+import org.springframework.data.jpa.repository.EntityGraph.EntityGraphType;
 
 import java.util.HashMap;
 import java.util.List;
@@ -24,13 +25,15 @@ public class JpaBookRepository implements BookRepository {
         EntityGraph<?> entityGraph = em.getEntityGraph("book-entity-graph");
 
         Map<String, Object> properties = new HashMap<>();
-        properties.put("jakarta.persistence.fetchgraph", entityGraph);
+        properties.put(EntityGraphType.FETCH.getKey(), entityGraph);
          return Optional.ofNullable(em.find(Book.class, id, properties));
     }
 
     @Override
     public List<Book> findAll() {
-        return em.createQuery("select b from Book b join fetch b.author", Book.class)
+        EntityGraph<?> entityGraph = em.getEntityGraph("book-entity-graph");
+        return em.createQuery("select b from Book b", Book.class)
+                .setHint(EntityGraphType.FETCH.getKey(), entityGraph)
                 .getResultList();
     }
 

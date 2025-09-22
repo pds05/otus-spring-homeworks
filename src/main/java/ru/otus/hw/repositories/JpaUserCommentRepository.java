@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import ru.otus.hw.models.Book;
 import ru.otus.hw.models.UserComment;
+import org.springframework.data.jpa.repository.EntityGraph.EntityGraphType;
 
 import java.util.HashMap;
 import java.util.List;
@@ -25,7 +26,7 @@ public class JpaUserCommentRepository implements UserCommentRepository {
         EntityGraph<?> entityGraph = em.getEntityGraph("user-comment-entity-graph");
 
         Map<String, Object> properties = new HashMap<>();
-        properties.put("jakarta.persistence.fetchgraph", entityGraph);
+        properties.put(EntityGraphType.FETCH.getKey(), entityGraph);
 
         return Optional.ofNullable(em.find(UserComment.class, id, properties));
     }

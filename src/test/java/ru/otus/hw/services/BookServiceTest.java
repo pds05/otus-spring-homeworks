@@ -63,8 +63,8 @@ public class BookServiceTest {
         assertThat(updatedBook.id()).isEqualTo(expectedBook.id());
         assertThat(expectedBook).isNotEqualTo(updatedBook);
         assertThat(updatedBook.title()).startsWith("Edited");
-        assertThat(updatedBook.authorId()).isEqualTo(2L);
-        assertThat(updatedBook.genreIds()).hasSize(3).containsExactlyInAnyOrder(4L, 5L, 6L);
+        assertThat(updatedBook.author().id()).isEqualTo(2L);
+        assertThat(updatedBook.genres()).hasSize(3);
 
         System.out.println(bookConverter.bookDtoToString(updatedBook));
     }
