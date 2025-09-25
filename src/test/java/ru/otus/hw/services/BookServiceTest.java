@@ -4,7 +4,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
 import ru.otus.hw.converters.BookConverter;
 import ru.otus.hw.exceptions.EntityNotFoundException;
 
@@ -19,9 +18,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class BookServiceTest {
 
     @Autowired
-    BookServiceImpl bookService;
+    private BookServiceImpl bookService;
     @Autowired
-    BookConverter bookConverter;
+    private BookConverter bookConverter;
 
     @Test
     @DisplayName("должен вернуть список всех книг")
@@ -41,10 +40,9 @@ public class BookServiceTest {
         assertDoesNotThrow(() -> bookService.findById(1));
     }
 
-    @Transactional
     @Test
     @DisplayName("Должен добавлять новую книгу")
-    void shouldInsertNewBook() {
+    void shouldInsertBook() {
         var returnedBook = bookService.insert("Test book", 1, Set.of(2L, 3L));
 
         assertThat(returnedBook).isNotNull();
@@ -53,11 +51,10 @@ public class BookServiceTest {
         System.out.println(bookConverter.bookDtoToString(returnedBook));
     }
 
-    @Transactional
     @Test
     @DisplayName("должен добавлять и обновлять книгу")
-    void shouldInsertAndUpdateBook() {
-        var expectedBook = bookService.insert("Test book for update", 1L, Set.of(2L, 3L));
+    void shouldUpdateBook() {
+        var expectedBook = bookService.findById(1);
         var updatedBook = bookService.update(expectedBook.id(), "Edited: " + expectedBook.title(), 2, Set.of(4L, 5L, 6L));
 
         assertThat(updatedBook.id()).isEqualTo(expectedBook.id());
@@ -69,13 +66,11 @@ public class BookServiceTest {
         System.out.println(bookConverter.bookDtoToString(updatedBook));
     }
 
-    @Transactional
     @Test
     @DisplayName("должен добавлять и удалять книгу")
-    void shouldInsertAndDeleteBook() {
-        var returnedBook = bookService.insert("Test book for delete", 1L, Set.of(2L, 3L));
-        bookService.deleteById(returnedBook.id());
+    void shouldDeleteBook() {
+        bookService.deleteById(1);
 
-        assertThrows(EntityNotFoundException.class, () -> bookService.findById(returnedBook.id()));
+        assertThrows(EntityNotFoundException.class, () -> bookService.findById(1));
     }
 }

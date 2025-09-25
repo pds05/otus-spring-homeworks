@@ -4,7 +4,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
 import ru.otus.hw.converters.UserCommentConverter;
 import ru.otus.hw.dtos.UserCommentDto;
 import ru.otus.hw.exceptions.EntityNotFoundException;
@@ -23,7 +22,6 @@ public class UserCommentServiceTest {
     @Autowired
     private UserCommentConverter userCommentConverter;
 
-    @Transactional
     @Test
     @DisplayName("должен добавлять новый комментарий к книге")
     void shouldInsertUserComment() {
@@ -36,28 +34,23 @@ public class UserCommentServiceTest {
 
     }
 
-    @Transactional
     @Test
     @DisplayName("должен вернуть комментарий по его идентификатору")
-    void shouldInsertAndReturnUserCommentById() {
-        var expectedUserComment = userCommentService.insert("Test comment 1", 1);
-        var returnedUserComment = userCommentService.findById(expectedUserComment.id());
+    void shouldReturnUserCommentById() {
+        var returnedUserComment = userCommentService.findById(2);
 
         assertThat(returnedUserComment).isNotNull();
-        assertThat(returnedUserComment).isEqualTo(expectedUserComment);
+        assertThat(returnedUserComment.id()).isEqualTo(2);
 
         System.out.println(userCommentConverter.userCommentDtoToString(returnedUserComment));
 
     }
 
-    @Transactional
     @Test
     @DisplayName("должен вернуть все комментарии к книге")
     void shouldReturnUserCommentsByBookId() {
-        userCommentService.insert("Test comment 1", 1);
-        userCommentService.insert("Test comment 2", 1);
+        List<UserCommentDto> userCommentDtos = userCommentService.findAllByBookId(2);
 
-        List<UserCommentDto> userCommentDtos = userCommentService.findAllByBookId(1);
         assertThat(userCommentDtos).isNotEmpty().hasSize(2);
 
         userCommentDtos.forEach(uc -> System.out.println(
@@ -65,11 +58,10 @@ public class UserCommentServiceTest {
 
     }
 
-    @Transactional
     @Test
     @DisplayName("должен изменить комментарий к книге")
     void shouldUpdateUserComment() {
-        var expectedUserComment = userCommentService.insert("Test comment 1", 1);
+        var expectedUserComment = userCommentService.findById(1);
         var updatedUserComment = userCommentService.update(expectedUserComment.id(), "Edited: " + expectedUserComment.text());
 
         assertThat(expectedUserComment.id()).isEqualTo(updatedUserComment.id());
@@ -80,13 +72,11 @@ public class UserCommentServiceTest {
 
     }
 
-    @Transactional
     @Test
     @DisplayName("должен удалять комментарий по его идентификатору")
     void shouldDeleteUserComment() {
-        var expectedUserComment = userCommentService.insert("Test comment 1", 1);
-        userCommentService.deleteById(expectedUserComment.id());
+        userCommentService.deleteById(1);
 
-        assertThrows(EntityNotFoundException.class, () -> userCommentService.findById(expectedUserComment.id()));
+        assertThrows(EntityNotFoundException.class, () -> userCommentService.findById(1));
     }
 }

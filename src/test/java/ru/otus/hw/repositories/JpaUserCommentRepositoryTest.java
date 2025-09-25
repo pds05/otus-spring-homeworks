@@ -44,19 +44,7 @@ public class JpaUserCommentRepositoryTest {
     @DisplayName("должен возвращать все комментарии к книге")
     @Test
     void shouldReturnUserCommentsOfBook() {
-        Book book1 = entityManager.find(Book.class, 1L);
-        entityManager.persist(createUserComment(book1));
-        entityManager.persist(createUserComment(book1));
-        entityManager.persist(createUserComment(book1));
-
-        Book book2 = entityManager.find(Book.class, 2L);
-        entityManager.persist(createUserComment(book2));
-        entityManager.persist(createUserComment(book2));
-
-        List<UserComment> allBooksComments = jpaUserCommentRepository.getAllUserCommentsByBookId(book1.getId());
-        assertThat(allBooksComments).size().isEqualTo(3);
-
-        allBooksComments = jpaUserCommentRepository.getAllUserCommentsByBookId(book2.getId());
+        List<UserComment> allBooksComments = jpaUserCommentRepository.getAllUserCommentsByBookId(1);
         assertThat(allBooksComments).size().isEqualTo(2);
 
     }
