@@ -35,10 +35,15 @@ import java.util.List;
 @Entity
 @Table(name = "books")
 @NamedEntityGraph(
-        name = "book-entity-graph",
+        name = "one-book-entity-graph",
         attributeNodes = {
                 @NamedAttributeNode("author"),
                 @NamedAttributeNode("genres")
+        })
+@NamedEntityGraph(
+        name = "all-books-entity-graph",
+        attributeNodes = {
+                @NamedAttributeNode("author")
         })
 public class Book {
     @Id
