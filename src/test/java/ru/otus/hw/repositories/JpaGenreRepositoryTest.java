@@ -32,7 +32,6 @@ public class JpaGenreRepositoryTest {
         var actualGenres = genreRepository.findAll();
 
         assertThat(actualGenres).isNotEmpty().allMatch(g -> g.getId() > 0L);
-        actualGenres.forEach(System.out::println);
     }
 
     @DisplayName("должен загружать список жанров по списку идентификаторов")
@@ -50,6 +49,5 @@ public class JpaGenreRepositoryTest {
         assertThat(returnedGenres.size()).isEqualTo(expectedIds.size());
         assertThat(returnedGenres).allMatch(genre -> expectedIds.contains(genre.getId()));
         assertThat(returnedGenres).containsExactlyElementsOf(expectedGenres);
-        returnedGenres.forEach(System.out::println);
     }
 }

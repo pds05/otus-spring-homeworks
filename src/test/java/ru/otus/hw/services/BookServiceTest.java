@@ -4,7 +4,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import ru.otus.hw.converters.BookConverter;
 import ru.otus.hw.exceptions.EntityNotFoundException;
 
 import java.util.Set;
@@ -19,8 +18,6 @@ public class BookServiceTest {
 
     @Autowired
     private BookServiceImpl bookService;
-    @Autowired
-    private BookConverter bookConverter;
 
     @Test
     @DisplayName("должен вернуть список всех книг")
@@ -29,9 +26,6 @@ public class BookServiceTest {
 
         assertThat(books).isNotNull();
         assertThat(books).size().isEqualTo(3);
-
-        books.forEach(book -> System.out.println(
-                bookConverter.bookDtoToString(book)));
     }
 
     @Test
@@ -47,8 +41,6 @@ public class BookServiceTest {
 
         assertThat(returnedBook).isNotNull();
         assertThat(returnedBook.id()).isGreaterThan(0);
-
-        System.out.println(bookConverter.bookDtoToString(returnedBook));
     }
 
     @Test
@@ -62,8 +54,6 @@ public class BookServiceTest {
         assertThat(updatedBook.title()).startsWith("Edited");
         assertThat(updatedBook.author().id()).isEqualTo(2L);
         assertThat(updatedBook.genres()).hasSize(3);
-
-        System.out.println(bookConverter.bookDtoToString(updatedBook));
     }
 
     @Test

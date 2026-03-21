@@ -4,7 +4,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import ru.otus.hw.converters.UserCommentConverter;
 import ru.otus.hw.dtos.UserCommentDto;
 import ru.otus.hw.exceptions.EntityNotFoundException;
 
@@ -19,8 +18,6 @@ public class UserCommentServiceTest {
 
     @Autowired
     private UserCommentService userCommentService;
-    @Autowired
-    private UserCommentConverter userCommentConverter;
 
     @Test
     @DisplayName("должен добавлять новый комментарий к книге")
@@ -29,9 +26,6 @@ public class UserCommentServiceTest {
 
         assertThat(returnedUserComment).isNotNull();
         assertThat(returnedUserComment.id()).isGreaterThan(0);
-
-        System.out.println(userCommentConverter.userCommentDtoToString(returnedUserComment));
-
     }
 
     @Test
@@ -41,9 +35,6 @@ public class UserCommentServiceTest {
 
         assertThat(returnedUserComment).isNotNull();
         assertThat(returnedUserComment.id()).isEqualTo(2);
-
-        System.out.println(userCommentConverter.userCommentDtoToString(returnedUserComment));
-
     }
 
     @Test
@@ -52,10 +43,6 @@ public class UserCommentServiceTest {
         List<UserCommentDto> userCommentDtos = userCommentService.findAllByBookId(2);
 
         assertThat(userCommentDtos).isNotEmpty().hasSize(2);
-
-        userCommentDtos.forEach(uc -> System.out.println(
-                userCommentConverter.userCommentDtoToString(uc)));
-
     }
 
     @Test
@@ -67,9 +54,6 @@ public class UserCommentServiceTest {
         assertThat(expectedUserComment.id()).isEqualTo(updatedUserComment.id());
         assertThat(expectedUserComment).isNotEqualTo(updatedUserComment);
         assertThat(updatedUserComment.text()).startsWith("Edited");
-
-        System.out.println(userCommentConverter.userCommentDtoToString(updatedUserComment));
-
     }
 
     @Test

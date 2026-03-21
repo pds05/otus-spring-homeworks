@@ -35,7 +35,6 @@ class JpaBookRepositoryTest {
         assertThat(optionalBook).isPresent()
                 .get()
                 .isEqualTo(expectedBook);
-        System.out.println(optionalBook.get());
     }
 
     @DisplayName("должен загружать список всех книг")
@@ -44,7 +43,6 @@ class JpaBookRepositoryTest {
         var actualBooks = bookRepository.findAll();
 
         assertThat(actualBooks).isNotEmpty().allMatch(b -> b.getId() > 0L);
-        actualBooks.forEach(System.out::println);
     }
 
     @DisplayName("должен сохранять новую книгу")
@@ -60,8 +58,6 @@ class JpaBookRepositoryTest {
                 .usingRecursiveComparison().ignoringExpectedNullFields().isEqualTo(expectedBook);
 
         assertThat(entityManager.find(Book.class, returnedBook.getId())).isEqualTo(expectedBook);
-
-        System.out.println(returnedBook);
     }
 
     @DisplayName("должен сохранять измененную книгу")
@@ -81,8 +77,6 @@ class JpaBookRepositoryTest {
 
         assertThat(entityManager.find(Book.class, returnedBook.getId()))
                 .isEqualTo(returnedBook);
-
-        System.out.println(returnedBook);
     }
 
     @DisplayName("должен удалять книгу по id ")

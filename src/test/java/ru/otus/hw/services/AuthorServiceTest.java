@@ -23,9 +23,6 @@ public class AuthorServiceTest {
 
         assertThat(authors).isNotNull();
         assertThat(authors.size()).isEqualTo(3);
-
-        authors.forEach(author -> System.out.println(
-                authorConverter.authorDtoToString(author)));
     }
 
 }
