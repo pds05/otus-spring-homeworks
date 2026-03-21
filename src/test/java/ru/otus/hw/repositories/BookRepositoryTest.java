@@ -16,13 +16,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("Репозиторий на основе Jpa для работы с книгами ")
 @DataJpaTest
-@Import({JpaBookRepository.class})
-class JpaBookRepositoryTest {
+class BookRepositoryTest {
 
-    public static final int FIRST_BOOK_ID = 1;
+    public static final long FIRST_BOOK_ID = 1;
 
     @Autowired
-    private JpaBookRepository bookRepository;
+    private BookRepository bookRepository;
 
     @Autowired
     private TestEntityManager entityManager;

@@ -34,7 +34,7 @@ public class UserCommentServiceImpl implements UserCommentService {
     @Transactional(readOnly = true)
     @Override
     public List<UserCommentDto> findAllByBookId(long bookId) {
-        return userCommentRepository.getAllUserCommentsByBookId(bookId).stream()
+        return userCommentRepository.getUserCommentsByBookId(bookId).stream()
                 .map(userCommentConverter::userCommentToDto)
                 .toList();
     }
