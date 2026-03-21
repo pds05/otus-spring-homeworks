@@ -2,8 +2,6 @@ package ru.otus.hw.models;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import jakarta.persistence.NamedEntityGraph;
-import jakarta.persistence.NamedAttributeNode;
 import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Column;
@@ -23,18 +21,11 @@ import lombok.ToString;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString(exclude = {"user", "book"})
-@EqualsAndHashCode(exclude = {"user", "book"})
+@ToString(exclude = "book")
+@EqualsAndHashCode(exclude = "book")
 
 @Entity
 @Table(name = "user_comments")
-@NamedEntityGraph(
-        name = "user-comment-entity-graph",
-        attributeNodes = {
-                @NamedAttributeNode("user"),
-                @NamedAttributeNode("book")
-        }
-)
 public class UserComment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,10 +33,6 @@ public class UserComment {
 
     @Column(name = "text")
     private String text;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "book_id", nullable = false)

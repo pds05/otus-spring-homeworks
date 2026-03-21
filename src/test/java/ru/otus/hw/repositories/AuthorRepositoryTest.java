@@ -27,7 +27,6 @@ public class AuthorRepositoryTest {
         var authors = authorRepository.findAll();
 
         assertThat(authors).isNotEmpty().allMatch(a -> a.getId() > 0L);
-        authors.forEach(System.out::println);
     }
 
     @DisplayName("должен загружать автора по его id")
@@ -37,6 +36,5 @@ public class AuthorRepositoryTest {
         var expectedAuthor = entityManager.find(Author.class, FIRST_AUTHOR_ID);
 
         assertThat(optionalAuthor).isPresent().get().isEqualTo(expectedAuthor);
-        System.out.println(optionalAuthor.get());
     }
 }

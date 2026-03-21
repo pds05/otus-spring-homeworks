@@ -1,9 +1,6 @@
 insert into authors(full_name)
 values ('Author_1'), ('Author_2'), ('Author_3');
 
-insert into users(user_name)
-values ('User_1'), ('User_2'), ('User_3');
-
 insert into genres(name)
 values ('Genre_1'), ('Genre_2'), ('Genre_3'),
        ('Genre_4'), ('Genre_5'), ('Genre_6');
@@ -15,3 +12,8 @@ insert into books_genres(book_id, genre_id)
 values (1, 1),   (1, 2),
        (2, 3),   (2, 4),
        (3, 5),   (3, 6);
+
+insert into user_comments(text, book_id)
+values ('BookComment_1_1', 1), ('BookComment_1_2', 1),
+       ('BookComment_2_1', 2), ('BookComment_2_2', 2),
+       ('BookComment_3_1', 3)

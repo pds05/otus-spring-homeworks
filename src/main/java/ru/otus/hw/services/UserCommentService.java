@@ -1,20 +1,17 @@
 package ru.otus.hw.services;
 
-import ru.otus.hw.models.UserComment;
+import ru.otus.hw.dtos.UserCommentDto;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface UserCommentService {
-    Optional<UserComment> findById(long id);
+    UserCommentDto findById(long id);
 
-    List<UserComment> findAllByUserId(long userId);
+    List<UserCommentDto> findAllByBookId(long bookId);
 
-    List<UserComment> findAllByBookId(long bookId);
+    UserCommentDto insert(String text, long bookId);
 
-    UserComment insert(String text, long userId, long bookId);
-
-    UserComment update(long id, String text);
+    UserCommentDto update(long id, String text);
 
     void deleteById(long id);
 

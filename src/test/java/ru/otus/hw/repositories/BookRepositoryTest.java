@@ -5,23 +5,24 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.context.annotation.Import;
 import ru.otus.hw.models.Author;
 import ru.otus.hw.models.Book;
 import ru.otus.hw.models.Genre;
 
-import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("Репозиторий на основе Jpa для работы с книгами ")
 @DataJpaTest
-class BookRepositoryTest {
+@Import({JpaBookRepository.class})
+class JpaBookRepositoryTest {
 
-    public static final long FIRST_BOOK_ID = 1;
+    public static final int FIRST_BOOK_ID = 1;
 
     @Autowired
-    private BookRepository bookRepository;
+    private JpaBookRepository bookRepository;
 
     @Autowired
     private TestEntityManager entityManager;
@@ -34,7 +35,6 @@ class BookRepositoryTest {
         assertThat(optionalBook).isPresent()
                 .get()
                 .isEqualTo(expectedBook);
-        System.out.println(optionalBook.get());
     }
 
     @DisplayName("должен загружать список всех книг")
@@ -43,7 +43,6 @@ class BookRepositoryTest {
         var actualBooks = bookRepository.findAll();
 
         assertThat(actualBooks).isNotEmpty().allMatch(b -> b.getId() > 0L);
-        actualBooks.forEach(System.out::println);
     }
 
     @DisplayName("должен сохранять новую книгу")
@@ -52,16 +51,13 @@ class BookRepositoryTest {
         var author = entityManager.find(Author.class, 3);
         var genre3 = entityManager.find(Genre.class, 3);
         var genre6 = entityManager.find(Genre.class, 6);
-        var expectedBook = new Book(0, "BookTitle_10500", author, List.of(genre3, genre6), Collections.emptySet());
+        var expectedBook = new Book(0, "BookTitle_10500", author, List.of(genre3, genre6));
         var returnedBook = bookRepository.save(expectedBook);
         assertThat(returnedBook).isNotNull()
                 .matches(book -> book.getId() > 0)
                 .usingRecursiveComparison().ignoringExpectedNullFields().isEqualTo(expectedBook);
 
-        assertThat(entityManager.find(Book.class, returnedBook.getId()))
-                .isEqualTo(returnedBook);
-
-        System.out.println(returnedBook);
+        assertThat(entityManager.find(Book.class, returnedBook.getId())).isEqualTo(expectedBook);
     }
 
     @DisplayName("должен сохранять измененную книгу")
@@ -71,10 +67,8 @@ class BookRepositoryTest {
         var genre2 = entityManager.find(Genre.class, 2);
         var genre4 = entityManager.find(Genre.class, 4);
         var expectedBook = new Book(FIRST_BOOK_ID, "BookTitle_10500", author,
-                List.of(genre2, genre4), Collections.emptySet());
-
-        assertThat(entityManager.find(Book.class, expectedBook.getId()))
-                .isNotEqualTo(expectedBook);
+                List.of(genre2, genre4));
+        assertThat(entityManager.find(Book.class, expectedBook.getId())).isNotEqualTo(expectedBook);
 
         var returnedBook = bookRepository.save(expectedBook);
         assertThat(returnedBook).isNotNull()
@@ -83,8 +77,6 @@ class BookRepositoryTest {
 
         assertThat(entityManager.find(Book.class, returnedBook.getId()))
                 .isEqualTo(returnedBook);
-
-        System.out.println(returnedBook);
     }
 
     @DisplayName("должен удалять книгу по id ")

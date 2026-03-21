@@ -10,11 +10,9 @@ import jakarta.persistence.Column;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.NamedSubgraph;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -22,31 +20,31 @@ import lombok.EqualsAndHashCode;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import java.util.List;
-import java.util.Set;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString(exclude = {"author", "genres", "userComments"})
-@EqualsAndHashCode(exclude = {"author", "genres", "userComments"})
+@ToString(exclude = {"author", "genres"})
+@EqualsAndHashCode(exclude = {"author", "genres"})
 
 @Entity
 @Table(name = "books")
 @NamedEntityGraph(
-        name = "book-entity-graph",
+        name = "one-book-entity-graph",
         attributeNodes = {
                 @NamedAttributeNode("author"),
-                @NamedAttributeNode("genres"),
-                @NamedAttributeNode(value = "userComments", subgraph = "book-userComments-entity-graph")
-        },
-        subgraphs = @NamedSubgraph(name = "book-userComments-entity-graph",
-        attributeNodes = {@NamedAttributeNode("user"),
-                @NamedAttributeNode("book")})
-)
-
+                @NamedAttributeNode("genres")
+        })
+@NamedEntityGraph(
+        name = "all-books-entity-graph",
+        attributeNodes = {
+                @NamedAttributeNode("author")
+        })
 public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -59,12 +57,11 @@ public class Book {
     @JoinColumn(name = "author_id", nullable = false)
     private Author author;
 
+    @Fetch(FetchMode.SUBSELECT)
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "books_genres",
             joinColumns = @JoinColumn(name = "book_id"),
             inverseJoinColumns = @JoinColumn(name = "genre_id"))
     private List<Genre> genres;
 
-    @OneToMany(mappedBy = "book", fetch = FetchType.LAZY)
-    private Set<UserComment> userComments;
 }
