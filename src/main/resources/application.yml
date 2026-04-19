@@ -1,24 +1,22 @@
 spring:
-  jpa:
-    hibernate:
-      ddl-auto: none
-    database-platform: org.hibernate.dialect.H2Dialect
-    show-sql: true
-  #    defer-datasource-initialization: true
-  datasource:
-    url: jdbc:h2:mem:maindb
-    driverClassName: org.h2.Driver
+  data:
+    mongodb:
+      database: test
+      port: 27017
+      host: localhost
   shell:
     command:
       stacktrace:
         enabled: true
-  sql:
-    init:
-      mode: always
-      data-locations: data.sql
-      schema-locations: schema.sql
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
-      
+mongock:
+#  runner-type: "ApplicationRunner"
+  runner-type: "InitializingBean"
+  migration-scan-package: "ru.otus.hw.mongock.changeunits"
+logging:
+  level:
+    org:
+      springframework:
+        data:
+          mongodb:
+            core:
+              MongoTemplate: DEBUG

@@ -5,15 +5,15 @@ import ru.otus.hw.dtos.UserCommentDto;
 import java.util.List;
 
 public interface UserCommentService {
-    UserCommentDto findById(long id);
+    UserCommentDto findById(String id);
 
-    List<UserCommentDto> findAllByBookId(long bookId);
+    List<UserCommentDto> findAllByBookId(String bookId);
 
-    UserCommentDto insert(String text, long bookId);
+    UserCommentDto insert(String text, String bookId);
 
-    UserCommentDto update(long id, String text);
+    UserCommentDto update(String id, String text);
 
-    void deleteById(long id);
+    void deleteById(String id);
 
 
 }

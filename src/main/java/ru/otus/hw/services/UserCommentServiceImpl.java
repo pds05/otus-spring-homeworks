@@ -2,7 +2,6 @@ package ru.otus.hw.services;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import ru.otus.hw.converters.UserCommentConverter;
 import ru.otus.hw.dtos.UserCommentDto;
 import ru.otus.hw.exceptions.EntityNotFoundException;
@@ -23,25 +22,22 @@ public class UserCommentServiceImpl implements UserCommentService {
 
     private final UserCommentConverter userCommentConverter;
 
-    @Transactional(readOnly = true)
     @Override
-    public UserCommentDto findById(long id) {
+    public UserCommentDto findById(String id) {
         return userCommentRepository.getUserCommentById(id)
                 .map(userCommentConverter::userCommentToDto)
                 .orElseThrow(() -> new EntityNotFoundException("User comment id %d not found".formatted(id)));
     }
 
-    @Transactional(readOnly = true)
     @Override
-    public List<UserCommentDto> findAllByBookId(long bookId) {
+    public List<UserCommentDto> findAllByBookId(String bookId) {
         return userCommentRepository.getUserCommentsByBookId(bookId).stream()
                 .map(userCommentConverter::userCommentToDto)
                 .toList();
     }
 
-    @Transactional
     @Override
-    public UserCommentDto insert(String text, long bookId) {
+    public UserCommentDto insert(String text, String bookId) {
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new EntityNotFoundException("Book id %d not found".formatted(bookId)));
         UserComment userComment = new UserComment();
@@ -52,9 +48,8 @@ public class UserCommentServiceImpl implements UserCommentService {
         return userCommentConverter.userCommentToDto(savedUserComment);
     }
 
-    @Transactional
     @Override
-    public UserCommentDto update(long id, String text) {
+    public UserCommentDto update(String id, String text) {
         UserComment userComment = userCommentRepository.getUserCommentById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User comment id %d not found".formatted(id)));
         userComment.setText(text);
@@ -63,9 +58,8 @@ public class UserCommentServiceImpl implements UserCommentService {
         return userCommentConverter.userCommentToDto(userComment);
     }
 
-    @Transactional
     @Override
-    public void deleteById(long id) {
+    public void deleteById(String id) {
         userCommentRepository.deleteById(id);
     }
 }

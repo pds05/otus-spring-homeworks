@@ -7,11 +7,11 @@ import ru.otus.hw.models.Author;
 @Component
 public class AuthorConverter {
     public String authorToString(Author author) {
-        return "Id: %d, FullName: %s".formatted(author.getId(), author.getFullName());
+        return "Id: %s, FullName: %s".formatted(author.getId(), author.getFullName());
     }
 
     public String authorDtoToString(AuthorDto authorDto) {
-        return "Id: %d, FullName: %s".formatted(authorDto.id(), authorDto.fullName());
+        return "Id: %s, FullName: %s".formatted(authorDto.id(), authorDto.fullName());
     }
 
     public AuthorDto authorToDto(Author author) {

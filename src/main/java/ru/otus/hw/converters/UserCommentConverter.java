@@ -12,14 +12,14 @@ public class UserCommentConverter {
     private final BookConverter bookConverter;
 
     public String userCommentToString(UserComment userComment) {
-        return "Id: %d, Book: %s, Text: %s".formatted(
+        return "Id: %s, Book: %s, Text: %s".formatted(
                 userComment.getId(),
                 bookConverter.bookToString(userComment.getBook()),
                 userComment.getText());
     }
 
     public String userCommentDtoToString(UserCommentDto userCommentDto) {
-        return "Id: %d, BookId: %d, Text: %s".formatted(
+        return "Id: %s, BookId: %s, Text: %s".formatted(
                 userCommentDto.id(),
                 userCommentDto.bookId(),
                 userCommentDto.text());

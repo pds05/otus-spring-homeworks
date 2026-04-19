@@ -1,18 +1,18 @@
 package ru.otus.hw.repositories;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
+import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 import ru.otus.hw.models.Genre;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Repository
-public interface GenreRepository extends JpaRepository<Genre, Long> {
+public interface GenreRepository extends MongoRepository<Genre, String> {
 
-    @Query("select g from Genre g where g.id in :ids")
-    List<Genre> findAllByIds(@Param("ids") Set<Long> ids);
+    List<Genre> findAllByIdIn(Set<String> ids);
+
+    Optional<Genre> findByName(String name);
 
 }
