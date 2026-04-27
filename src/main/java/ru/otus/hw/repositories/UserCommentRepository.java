@@ -13,4 +13,6 @@ public interface UserCommentRepository extends MongoRepository<UserComment, Stri
 
     List<UserComment> getUserCommentsByBookId(String bookId);
 
+    void deleteAllByBookId(String bookId);
+
 }

@@ -9,8 +9,10 @@ import ru.otus.hw.models.Book;
 import ru.otus.hw.repositories.AuthorRepository;
 import ru.otus.hw.repositories.BookRepository;
 import ru.otus.hw.repositories.GenreRepository;
+import ru.otus.hw.repositories.UserCommentRepository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.springframework.util.CollectionUtils.isEmpty;
@@ -26,11 +28,13 @@ public class BookServiceImpl implements BookService {
 
     private final BookConverter bookConverter;
 
+    private final UserCommentRepository userCommentRepository;
+
     @Override
     public BookDto findById(String id) {
-        return bookRepository.findById(id)
-                .map(bookConverter::bookToDto)
-                .orElseThrow(() -> new EntityNotFoundException("Book id %d not found".formatted(id)));
+        Optional<Book> book = bookRepository.findById(id);
+        return bookConverter.bookToDto(book.
+                orElseThrow(() -> new EntityNotFoundException("Book id %s not found".formatted(id))));
     }
 
     @Override
@@ -55,6 +59,7 @@ public class BookServiceImpl implements BookService {
     @Override
     public void deleteById(String id) {
         bookRepository.deleteById(id);
+        userCommentRepository.deleteAllByBookId(id);
     }
 
     private Book save(String id, String title, String authorId, Set<String> genresIds) {

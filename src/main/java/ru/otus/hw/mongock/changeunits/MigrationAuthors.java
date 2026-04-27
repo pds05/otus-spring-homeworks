@@ -10,7 +10,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import ru.otus.hw.models.Author;
 
 @AllArgsConstructor
-@ChangeUnit(id = "init-authors", order = "002", author = "mongock")
+@ChangeUnit(id="init-authors", order="002", author="mongock")
 public class MigrationAuthors {
 
     private final MongoTemplate mongoTemplate;
@@ -22,7 +22,6 @@ public class MigrationAuthors {
 
     @RollbackBeforeExecution
     public void rollbackBefore() {
-
     }
 
     @Execution
@@ -34,6 +33,5 @@ public class MigrationAuthors {
 
     @RollbackExecution
     public void rollback() {
-
     }
 }

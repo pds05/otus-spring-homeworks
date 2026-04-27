@@ -1,10 +1,13 @@
 package ru.otus.hw.services;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import ru.otus.hw.Application;
 import ru.otus.hw.exceptions.EntityNotFoundException;
 import ru.otus.hw.models.Author;
 import ru.otus.hw.models.Book;
@@ -19,12 +22,16 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("Сервис для работы с книгами")
 @DataMongoTest
+@ComponentScan(basePackageClasses = Application.class)
+@ExtendWith(SpringExtension.class)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class BookServiceTest {
     @Autowired
     private BookServiceImpl bookService;
     @Autowired
     private MongoTemplate mongoTemplate;
 
+    @Order(1)
     @Test
     @DisplayName("должен вернуть список всех книг")
     void shouldReturnBooksList() {
@@ -36,6 +43,7 @@ public class BookServiceTest {
         assertTrue(books.stream().allMatch(dto -> expected.stream().anyMatch(book -> book.getId().equals(dto.id()))));
     }
 
+    @Order(2)
     @Test
     @DisplayName("должен вернуть книгу по идентификатору")
     void shouldReturnBookById() {
@@ -43,6 +51,7 @@ public class BookServiceTest {
         assertDoesNotThrow(() -> bookService.findById(expected.getId()));
     }
 
+    @Order(3)
     @Test
     @DisplayName("Должен добавлять новую книгу")
     void shouldInsertBook() {
@@ -54,6 +63,7 @@ public class BookServiceTest {
         assertFalse(returnedBook.id().isBlank());
     }
 
+    @Order(4)
     @Test
     @DisplayName("Должен обновлять книгу")
     void shouldUpdateBook() {
@@ -69,12 +79,12 @@ public class BookServiceTest {
         assertThat(updatedBook.genres()).hasSize(2);
     }
 
+    @Order(5)
     @Test
-    @DisplayName("должен добавлять и удалять книгу")
+    @DisplayName("должен удалять книгу")
     void shouldDeleteBook() {
         var expectedBook = mongoTemplate.findAll(Book.class).get(0);
         bookService.deleteById(expectedBook.getId());
-
         assertThrows(EntityNotFoundException.class, () -> bookService.findById(expectedBook.getId()));
     }
 }

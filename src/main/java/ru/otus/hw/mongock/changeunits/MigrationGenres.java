@@ -10,7 +10,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import ru.otus.hw.models.Genre;
 
 @AllArgsConstructor
-@ChangeUnit(id="init-genres", order = "001", author = "mongock")
+@ChangeUnit(id="init-genres", order="001", author="mongock")
 public class MigrationGenres {
 
     private final MongoTemplate mongoTemplate;

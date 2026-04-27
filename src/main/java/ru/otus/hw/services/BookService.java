@@ -15,4 +15,5 @@ public interface BookService {
     BookDto update(String id, String title, String authorId, Set<String> genresIds);
 
     void deleteById(String id);
+
 }

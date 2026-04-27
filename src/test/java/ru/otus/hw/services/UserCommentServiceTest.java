@@ -1,10 +1,13 @@
 package ru.otus.hw.services;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import ru.otus.hw.Application;
 import ru.otus.hw.dtos.UserCommentDto;
 import ru.otus.hw.exceptions.EntityNotFoundException;
 import ru.otus.hw.models.Book;
@@ -17,12 +20,16 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("Сервис для работы с комментариями к книгам")
 @DataMongoTest
+@ComponentScan(basePackageClasses = Application.class)
+@ExtendWith(SpringExtension.class)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class UserCommentServiceTest {
     @Autowired
     private UserCommentService userCommentService;
     @Autowired
     private MongoTemplate mongoTemplate;
 
+    @Order(1)
     @Test
     @DisplayName("должен добавлять новый комментарий к книге")
     void shouldInsertUserComment() {
@@ -33,6 +40,7 @@ public class UserCommentServiceTest {
         assertFalse(returnedUserComment.id().isBlank());
     }
 
+    @Order(2)
     @Test
     @DisplayName("должен вернуть комментарий по его идентификатору")
     void shouldReturnUserCommentById() {
@@ -43,6 +51,7 @@ public class UserCommentServiceTest {
         assertThat(returnedUserComment.id()).isEqualTo(expectedUserComment.getId());
     }
 
+    @Order(3)
     @Test
     @DisplayName("должен вернуть все комментарии к книге")
     void shouldReturnUserCommentsByBookId() {
@@ -53,6 +62,7 @@ public class UserCommentServiceTest {
         assertTrue(userCommentDtos.stream().anyMatch(uc -> uc.text().startsWith("Test comment 1")));
     }
 
+    @Order(4)
     @Test
     @DisplayName("должен изменить комментарий к книге")
     void shouldUpdateUserComment() {
@@ -65,6 +75,7 @@ public class UserCommentServiceTest {
         assertThat(updatedUserComment.text()).startsWith("Edited");
     }
 
+    @Order(5)
     @Test
     @DisplayName("должен удалять комментарий по его идентификатору")
     void shouldDeleteUserComment() {

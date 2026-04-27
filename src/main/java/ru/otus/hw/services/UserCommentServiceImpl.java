@@ -11,6 +11,7 @@ import ru.otus.hw.repositories.BookRepository;
 import ru.otus.hw.repositories.UserCommentRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service("userCommentService")
 @RequiredArgsConstructor
@@ -24,9 +25,9 @@ public class UserCommentServiceImpl implements UserCommentService {
 
     @Override
     public UserCommentDto findById(String id) {
-        return userCommentRepository.getUserCommentById(id)
-                .map(userCommentConverter::userCommentToDto)
-                .orElseThrow(() -> new EntityNotFoundException("User comment id %d not found".formatted(id)));
+        Optional<UserComment> userComment = userCommentRepository.findById(id);
+        return userCommentConverter.userCommentToDto(userComment
+                .orElseThrow(() -> new EntityNotFoundException("User comment id %s not found".formatted(id))));
     }
 
     @Override
@@ -39,7 +40,7 @@ public class UserCommentServiceImpl implements UserCommentService {
     @Override
     public UserCommentDto insert(String text, String bookId) {
         Book book = bookRepository.findById(bookId)
-                .orElseThrow(() -> new EntityNotFoundException("Book id %d not found".formatted(bookId)));
+                .orElseThrow(() -> new EntityNotFoundException("Book id %s not found".formatted(bookId)));
         UserComment userComment = new UserComment();
         userComment.setText(text);
         userComment.setBook(book);
@@ -51,7 +52,7 @@ public class UserCommentServiceImpl implements UserCommentService {
     @Override
     public UserCommentDto update(String id, String text) {
         UserComment userComment = userCommentRepository.getUserCommentById(id)
-                .orElseThrow(() -> new EntityNotFoundException("User comment id %d not found".formatted(id)));
+                .orElseThrow(() -> new EntityNotFoundException("User comment id %s not found".formatted(id)));
         userComment.setText(text);
         userCommentRepository.save(userComment);
 
