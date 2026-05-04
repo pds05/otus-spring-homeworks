@@ -1,7 +1,7 @@
 spring:
   data:
     mongodb:
-      database: test
+      database: prod_db
       port: 27017
       host: localhost
   shell:
@@ -11,7 +11,7 @@ spring:
 mongock:
 #  runner-type: "ApplicationRunner"
   runner-type: "InitializingBean"
-  migration-scan-package: "ru.otus.hw.mongock.changeunits"
+  migration-scan-package: "ru.otus.hw.mongock.changeunits.prod"
   enabled: true
 logging:
   level:

@@ -25,8 +25,8 @@
             https://raw.githubusercontent.com/OtusTeam/Spring/master/checkstyle.xml
         </checkstyle.config.url>
         <reflections.version>0.10.2</reflections.version>
-        <embedded.mongo.version>4.7.0</embedded.mongo.version>
-        <mongock.version>5.2.4</mongock.version>
+        <embedded.mongo.version>4.24.0</embedded.mongo.version>
+        <mongock.version>5.3.6</mongock.version>
     </properties>
 
     <dependencies>
@@ -81,7 +81,7 @@
 
         <dependency>
             <groupId>de.flapdoodle.embed</groupId>
-            <artifactId>de.flapdoodle.embed.mongo.spring30x</artifactId>
+            <artifactId>de.flapdoodle.embed.mongo.spring3x</artifactId>
             <version>${embedded.mongo.version}</version>
             <scope>test</scope>
         </dependency>

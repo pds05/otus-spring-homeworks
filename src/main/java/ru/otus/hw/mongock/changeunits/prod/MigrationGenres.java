@@ -1,4 +1,4 @@
-package ru.otus.hw.mongock.changeunits;
+package ru.otus.hw.mongock.changeunits.prod;
 
 import io.mongock.api.annotations.BeforeExecution;
 import io.mongock.api.annotations.ChangeUnit;

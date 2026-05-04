@@ -1,10 +1,6 @@
-package ru.otus.hw.mongock.changeunits;
+package ru.otus.hw.mongock.changeunits.test;
 
-import io.mongock.api.annotations.BeforeExecution;
-import io.mongock.api.annotations.ChangeUnit;
-import io.mongock.api.annotations.Execution;
-import io.mongock.api.annotations.RollbackBeforeExecution;
-import io.mongock.api.annotations.RollbackExecution;
+import io.mongock.api.annotations.*;
 import lombok.AllArgsConstructor;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import ru.otus.hw.models.Author;

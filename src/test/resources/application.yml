@@ -1,14 +1,16 @@
 spring:
   data:
     mongodb:
-      database: test
+      database: test_db
+      port: 27018
+      host: localhost
   shell:
     interactive:
-      enabled: false
+      enabled: true
 mongock:
   runner-type: "ApplicationRunner"
-  migration-scan-package: "ru.otus.hw.mongock.changeunits"
-  enabled: false
+  migration-scan-package: "ru.otus.hw.mongock.changeunits.test"
+  enabled: true
   mongo-db:
     write-concern:
       journal: false

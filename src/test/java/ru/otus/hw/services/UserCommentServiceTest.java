@@ -1,13 +1,13 @@
 package ru.otus.hw.services;
 
-import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import ru.otus.hw.Application;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import ru.otus.hw.dtos.UserCommentDto;
 import ru.otus.hw.exceptions.EntityNotFoundException;
 import ru.otus.hw.models.Book;
@@ -20,27 +20,23 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("Сервис для работы с комментариями к книгам")
 @DataMongoTest
-@ComponentScan(basePackageClasses = Application.class)
-@ExtendWith(SpringExtension.class)
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@ComponentScan(basePackages = {"ru.otus.hw.services", "ru.otus.hw.converters"})
 public class UserCommentServiceTest {
     @Autowired
     private UserCommentService userCommentService;
     @Autowired
     private MongoTemplate mongoTemplate;
 
-    @Order(1)
     @Test
     @DisplayName("должен добавлять новый комментарий к книге")
     void shouldInsertUserComment() {
         var expectedBook = mongoTemplate.findAll(Book.class).get(0);
-        var returnedUserComment = userCommentService.insert("Test comment 1", expectedBook.getId());
+        var returnedUserComment = userCommentService.insert("New Test comment", expectedBook.getId());
 
         assertThat(returnedUserComment).isNotNull();
         assertFalse(returnedUserComment.id().isBlank());
     }
 
-    @Order(2)
     @Test
     @DisplayName("должен вернуть комментарий по его идентификатору")
     void shouldReturnUserCommentById() {
@@ -51,36 +47,34 @@ public class UserCommentServiceTest {
         assertThat(returnedUserComment.id()).isEqualTo(expectedUserComment.getId());
     }
 
-    @Order(3)
     @Test
     @DisplayName("должен вернуть все комментарии к книге")
     void shouldReturnUserCommentsByBookId() {
-        var expectedBook = mongoTemplate.findAll(Book.class).get(0);
-        List<UserCommentDto> userCommentDtos = userCommentService.findAllByBookId(expectedBook.getId());
+        var expectedUserComment = mongoTemplate.findAll(UserComment.class).get(0);
+        List<UserCommentDto> userCommentDtos = userCommentService.findAllByBookId(expectedUserComment.getBook().getId());
 
         assertThat(userCommentDtos).isNotEmpty();
-        assertTrue(userCommentDtos.stream().anyMatch(uc -> uc.text().startsWith("Test comment 1")));
+        assertTrue(userCommentDtos.stream().anyMatch(uc -> uc.text().contains("Test comment")));
     }
 
-    @Order(4)
     @Test
     @DisplayName("должен изменить комментарий к книге")
     void shouldUpdateUserComment() {
-        var expectedUserComments = mongoTemplate.findAll(UserComment.class);
-        var expectedUserComment = expectedUserComments.stream().filter(uc -> uc.getText().startsWith("Test comment 1")).findFirst().get();
-        var updatedUserComment = userCommentService.update(expectedUserComment.getId(), "Edited: " + expectedUserComment.getText());
+        var expectedUserComment = mongoTemplate.findOne(Query.query(Criteria.where("text").is("Test comment 2-1")), UserComment.class);
+        assertNotNull(expectedUserComment);
+
+        var updatedUserComment = userCommentService.update(expectedUserComment.getId(), "Edited " + expectedUserComment.getText());
 
         assertThat(expectedUserComment.getId()).isEqualTo(updatedUserComment.id());
         assertThat(expectedUserComment).isNotEqualTo(updatedUserComment);
         assertThat(updatedUserComment.text()).startsWith("Edited");
     }
 
-    @Order(5)
     @Test
     @DisplayName("должен удалять комментарий по его идентификатору")
     void shouldDeleteUserComment() {
-        var expectedUserComments = mongoTemplate.findAll(UserComment.class);
-        var expectedUserComment = expectedUserComments.stream().filter(uc -> uc.getText().contains("Test comment 1")).findFirst().get();
+        var expectedUserComment = mongoTemplate.findOne(Query.query(Criteria.where("text").is("Test comment 3-1")), UserComment.class);
+        assertNotNull(expectedUserComment);
         userCommentService.deleteById(expectedUserComment.getId());
 
         assertThrows(EntityNotFoundException.class, () -> userCommentService.findById(expectedUserComment.getId()));
