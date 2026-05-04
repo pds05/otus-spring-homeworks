@@ -1,0 +1,31 @@
+spring:
+  data:
+    mongodb:
+      database: test_db
+      port: 27018
+      host: localhost
+  shell:
+    interactive:
+      enabled: true
+mongock:
+  runner-type: "ApplicationRunner"
+  migration-scan-package: "ru.otus.hw.mongock.changeunits.test"
+  enabled: true
+  mongo-db:
+    write-concern:
+      journal: false
+    read-concern: local
+logging:
+  level:
+    org:
+      springframework:
+        boot:
+          autoconfigure:
+            mongo:
+              embedded: debug
+    mongodb: debug
+de:
+  flapdoodle:
+    mongodb:
+      embedded:
+        version: 6.0.5
