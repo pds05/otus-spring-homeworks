@@ -20,6 +20,7 @@ spring:
       path: /h2-console
 server:
   servlet:
+
     context-path: /library
 logging:
   level:

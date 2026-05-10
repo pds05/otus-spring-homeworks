@@ -37,6 +37,15 @@
             padding-left: 25px;
         }
     </style>
+
+    <style type="text/css" th:inline="text">
+        [[h3]] {
+            background-image: url([[@{/listmark.png}]]);
+            background-repeat: no-repeat;
+            padding: 2px;
+            padding-left: 30px;
+        }
+    </style>
 </head>
 <body>
     <h3>Books:</h3>
@@ -70,6 +79,10 @@
     <div class="row">
         <a href="book_edit.html" th:href="@{/book/edit}">
             <button type="button">Add book</button>
+        </a>
+
+        <a href="index.html" th:href="@{/}">
+            <button type="button">Back</button>
         </a>
     </div>
 </body>

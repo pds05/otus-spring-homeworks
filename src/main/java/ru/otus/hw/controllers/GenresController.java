@@ -18,7 +18,7 @@ public class GenresController {
     @GetMapping("/genre")
     public String viewAllGenres(Model model) {
         List<GenreDto> genres = genreService.findAll();
-        model.addAttribute("genres", genres);
+        model.addAttribute("allGenres", genres);
         return "genres";
     }
 }
