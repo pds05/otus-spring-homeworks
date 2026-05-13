@@ -3,7 +3,6 @@ package ru.otus.hw.controllers;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.util.LinkedMultiValueMap;
@@ -12,14 +11,12 @@ import ru.otus.hw.dtos.AuthorDto;
 import ru.otus.hw.dtos.BookDto;
 import ru.otus.hw.dtos.GenreDto;
 import ru.otus.hw.dtos.UserCommentDto;
-import ru.otus.hw.services.AuthorService;
-import ru.otus.hw.services.BookService;
-import ru.otus.hw.services.GenreService;
-import ru.otus.hw.services.UserCommentService;
+import ru.otus.hw.services.*;
 
 import java.util.List;
 import java.util.Set;
 
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.times;
@@ -36,7 +33,7 @@ public class BooksControllerTest {
     private MockMvc mvc;
 
     @MockitoBean
-    private BookService bookService;
+    private BookServiceImpl bookService;
 
     @MockitoBean
     private GenreService genreService;
@@ -80,40 +77,47 @@ public class BooksControllerTest {
 
     @Test
     void shouldUpdateBookAndRedirectToBookPage() throws Exception {
+        BookDto book = new BookDto(1L,
+                "updating Book",
+                new AuthorDto(1L, "Author 1"),
+                List.of(new GenreDto(1L, "Genre 1"), new GenreDto(2L, "Genre 2")));
         when(bookService.findById(1L)).thenReturn(books.get(0));
+        when(bookService.save(anyLong(), anyString(), anyLong(), anySet()))
+                .thenReturn(book);
         MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
-        form.add("id", "1");
-        form.add("title", "new Book 1");
-        form.add("author.id", "2");
-        form.add("genres", "GenreDto[id=3, name=Genre_3]");
-        form.add("genres", "GenreDto[id=4, name=Genre_4]");
-        form.add("action", "save");
+        form.add("id", book.id().toString());
+        form.add("title", book.title());
+        form.add("authorId", book.author().id().toString());
+        book.genres().forEach(genre -> form.add("genreIds", genre.id().toString()));
         mvc.perform(post("/book/edit").formFields(form))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name("redirect:/book/1"));
-        verify(bookService, times(1)).update(1L, "new Book 1", 2L, Set.of(3L, 4L));
+        verify(bookService, times(1)).save(1L, "updating Book", 1L, Set.of(1L, 2L));
     }
 
     @Test
     void shouldAddBookAndRedirectToBooksPage() throws Exception {
+        BookDto book = new BookDto(1L,
+                "new Book",
+                new AuthorDto(1L, "Author 1"),
+                List.of(new GenreDto(1L, "Genre 1"), new GenreDto(2L, "Genre 2")));
+        when(bookService.save(anyLong(), anyString(), anyLong(), anySet()))
+                .thenReturn(book);
         MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
-        form.add("title", "new Book");
-        form.add("author.id", "1");
-        form.add("genres", "GenreDto[id=1, name=Genre_1]");
-        form.add("genres", "GenreDto[id=2, name=Genre_2]");
-        form.add("action", "save");
+        form.add("title", book.title());
+        form.add("authorId", book.author().id().toString());
+        book.genres().forEach(genre -> form.add("genreIds", genre.id().toString()));
         mvc.perform(post("/book/edit").formFields(form))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(view().name("redirect:/book"));
-        verify(bookService, times(1)).insert("new Book", 1L, Set.of(1L, 2L));
+                .andExpect(view().name("redirect:/book/" + book.id().toString()));
+        verify(bookService, times(1)).save(0L, "new Book", 1L, Set.of(1L, 2L));
     }
 
     @Test
     void shouldDeleteBookAndRedirectToBooksPage() throws Exception {
         MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
-        form.add("id", "1");
-        form.add("action", "delete");
-        mvc.perform(post("/book/edit").formFields(form))
+        form.add("bookId", "1");
+        mvc.perform(post("/book/delete").formFields(form))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name("redirect:/book"));
         verify(bookService, times(1)).deleteById(1L);

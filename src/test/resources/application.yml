@@ -15,7 +15,6 @@ spring:
     init:
       mode: always
       data-locations: classpath:data.sql
-      schema-locations: classpath:schema.sql
   h2:
     console:
       enabled: true

@@ -3,7 +3,6 @@ package ru.otus.hw.services;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.otus.hw.converters.UserCommentConverter;
 import ru.otus.hw.dtos.UserCommentDto;
 import ru.otus.hw.exceptions.EntityNotFoundException;
 import ru.otus.hw.models.Book;
@@ -21,13 +20,11 @@ public class UserCommentServiceImpl implements UserCommentService {
 
     private final BookRepository bookRepository;
 
-    private final UserCommentConverter userCommentConverter;
-
     @Transactional(readOnly = true)
     @Override
     public UserCommentDto findById(long id) {
         return userCommentRepository.getUserCommentById(id)
-                .map(userCommentConverter::userCommentToDto)
+                .map(UserCommentDto::fromDomainObject)
                 .orElseThrow(() -> new EntityNotFoundException("User comment id %d not found".formatted(id)));
     }
 
@@ -35,7 +32,7 @@ public class UserCommentServiceImpl implements UserCommentService {
     @Override
     public List<UserCommentDto> findAllByBookId(long bookId) {
         return userCommentRepository.getUserCommentsByBookId(bookId).stream()
-                .map(userCommentConverter::userCommentToDto)
+                .map(UserCommentDto::fromDomainObject)
                 .toList();
     }
 
@@ -49,7 +46,7 @@ public class UserCommentServiceImpl implements UserCommentService {
         userComment.setBook(book);
         UserComment savedUserComment = userCommentRepository.save(userComment);
 
-        return userCommentConverter.userCommentToDto(savedUserComment);
+        return UserCommentDto.fromDomainObject(savedUserComment);
     }
 
     @Transactional
@@ -60,7 +57,7 @@ public class UserCommentServiceImpl implements UserCommentService {
         userComment.setText(text);
         userCommentRepository.save(userComment);
 
-        return userCommentConverter.userCommentToDto(userComment);
+        return UserCommentDto.fromDomainObject(userComment);
     }
 
     @Transactional

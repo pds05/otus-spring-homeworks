@@ -10,24 +10,24 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
-import ru.otus.hw.dtos.AuthorDto;
 import ru.otus.hw.dtos.BookDto;
 import ru.otus.hw.dtos.GenreDto;
+import ru.otus.hw.dtos.AuthorDto;
+import ru.otus.hw.dtos.BookFromUiDto;
 import ru.otus.hw.dtos.UserCommentDto;
-import ru.otus.hw.services.AuthorService;
-import ru.otus.hw.services.BookService;
+import ru.otus.hw.services.BookServiceImpl;
 import ru.otus.hw.services.GenreService;
+import ru.otus.hw.services.AuthorService;
 import ru.otus.hw.services.UserCommentService;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Controller
 @AllArgsConstructor
 @Slf4j
 public class BooksController {
 
-    private final BookService bookService;
+    private final BookServiceImpl bookService;
 
     private final GenreService genreService;
 
@@ -68,35 +68,23 @@ public class BooksController {
         return "book_edit";
     }
 
-    @PostMapping(value = "/book/edit", params = "action=save")
-    public String editBook(@ModelAttribute(value = "book") BookDto book,
+    @PostMapping(value = "/book/edit")
+    public String editBook(@ModelAttribute(value = "book") BookFromUiDto book,
                            BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             log.warn("Request binding error: {}", bindingResult.getAllErrors());
             return "redirect:/book";
         }
-        if (book.id() != null) {
-            bookService.update(book.id(),
-                    book.title(),
-                    book.author().id(),
-                    book.genres().stream().map(GenreDto::id).collect(Collectors.toSet()));
-            return "redirect:/book/" + book.id();
-        } else {
-            bookService.insert(book.title(),
-                    book.author().id(),
-                    book.genres().stream().map(GenreDto::id).collect(Collectors.toSet()));
-            return "redirect:/book";
-        }
+        var result = bookService.save(book.getId(),
+                book.getTitle(),
+                book.getAuthorId(),
+                book.getGenreIds());
+        return "redirect:/book/" + result.id();
     }
 
-    @PostMapping(value = "/book/edit", params = "action=delete")
-    public String deleteBook(@ModelAttribute(value = "book") BookDto book,
-                             BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            log.warn("Request binding error: {}", bindingResult.getAllErrors());
-            return "redirect:/book";
-        }
-        bookService.deleteById(book.id());
+    @PostMapping(value = "/book/delete")
+    public String deleteBook(Long bookId) {
+        bookService.deleteById(bookId);
         return "redirect:/book";
     }
 }
