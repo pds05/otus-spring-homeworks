@@ -1,22 +1,30 @@
 package ru.otus.hw.dtos;
 
-import lombok.Getter;
+
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.Nulls;
 import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Set;
 
 @NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
 public class BookFromUiDto {
 
-    private long id;
+    @JsonSetter(nulls = Nulls.SKIP)
+    private Long id = 0L;
 
     private String title;
 
     private long authorId;
 
-    private Set<Long> genreIds;
+    @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
+    private Set<String> genreIds;
 
 }

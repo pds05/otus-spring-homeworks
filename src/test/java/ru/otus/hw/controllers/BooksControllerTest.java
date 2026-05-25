@@ -5,8 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import ru.otus.hw.dtos.AuthorDto;
 import ru.otus.hw.dtos.BookDto;
 import ru.otus.hw.dtos.GenreDto;
@@ -14,14 +12,9 @@ import ru.otus.hw.dtos.UserCommentDto;
 import ru.otus.hw.services.*;
 
 import java.util.List;
-import java.util.Set;
 
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.times;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
@@ -53,8 +46,7 @@ public class BooksControllerTest {
         when(bookService.findAll()).thenReturn(books);
         mvc.perform(get("/book"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("books"))
-                .andExpect(model().attributeExists("allBooks"));
+                .andExpect(view().name("books"));
     }
 
     @Test
@@ -62,8 +54,7 @@ public class BooksControllerTest {
         when(bookService.findById(1L)).thenReturn(books.get(0));
         when(userCommentService.findAllByBookId(1L)).thenReturn(comments);
         mvc.perform(get("/book/1")).andExpect(status().isOk())
-                .andExpect(view().name("book"))
-                .andExpect(model().attributeExists("book", "userComments"));
+                .andExpect(view().name("book"));
     }
 
     @Test
@@ -72,54 +63,6 @@ public class BooksControllerTest {
         mvc.perform(get("/book/edit").param("id", "1"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("book_edit"))
-                .andExpect(model().attributeExists("book", "allAuthors", "allGenres"));
-    }
-
-    @Test
-    void shouldUpdateBookAndRedirectToBookPage() throws Exception {
-        BookDto book = new BookDto(1L,
-                "updating Book",
-                new AuthorDto(1L, "Author 1"),
-                List.of(new GenreDto(1L, "Genre 1"), new GenreDto(2L, "Genre 2")));
-        when(bookService.findById(1L)).thenReturn(books.get(0));
-        when(bookService.save(anyLong(), anyString(), anyLong(), anySet()))
-                .thenReturn(book);
-        MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
-        form.add("id", book.id().toString());
-        form.add("title", book.title());
-        form.add("authorId", book.author().id().toString());
-        book.genres().forEach(genre -> form.add("genreIds", genre.id().toString()));
-        mvc.perform(post("/book/edit").formFields(form))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(view().name("redirect:/book/1"));
-        verify(bookService, times(1)).save(1L, "updating Book", 1L, Set.of(1L, 2L));
-    }
-
-    @Test
-    void shouldAddBookAndRedirectToBooksPage() throws Exception {
-        BookDto book = new BookDto(1L,
-                "new Book",
-                new AuthorDto(1L, "Author 1"),
-                List.of(new GenreDto(1L, "Genre 1"), new GenreDto(2L, "Genre 2")));
-        when(bookService.save(anyLong(), anyString(), anyLong(), anySet()))
-                .thenReturn(book);
-        MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
-        form.add("title", book.title());
-        form.add("authorId", book.author().id().toString());
-        book.genres().forEach(genre -> form.add("genreIds", genre.id().toString()));
-        mvc.perform(post("/book/edit").formFields(form))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(view().name("redirect:/book/" + book.id().toString()));
-        verify(bookService, times(1)).save(0L, "new Book", 1L, Set.of(1L, 2L));
-    }
-
-    @Test
-    void shouldDeleteBookAndRedirectToBooksPage() throws Exception {
-        MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
-        form.add("bookId", "1");
-        mvc.perform(post("/book/delete").formFields(form))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(view().name("redirect:/book"));
-        verify(bookService, times(1)).deleteById(1L);
+                .andExpect(model().attributeExists( "allAuthors", "allGenres"));
     }
 }

@@ -41,59 +41,181 @@
             padding-left: 30px;
         }
     </style>
-</head>
-<body>
 
-<!--/*@thymesVar id="book" type="ru.otus.hw.dtos.BookDto"*/-->
-<!--/*@thymesVar id="genre" type="ru.otus.hw.dtos.GenreDto"*/-->
-<!--/*@thymesVar id="author" type="ru.otus.hw.dtos.AuthorDto"*/-->
-<form id="book-edit-form" action="book_edit.html" th:action="@{/book/edit}" th:method="post" th:object="${book}">
+    <script th:inline="javascript" type="text/javascript">
+        // ....
+
+        var authors = /*[[${allAuthors}]]*/ [];
+
+        function setSelectedAuthor(author) {
+            if (authors.find(a => a.id === author.id)) {
+                let option = document.getElementById("author-select-option-" + author.id);
+                option.selected = true
+            }
+        }
+    </script>
+
+    <script>
+        function setSelectedGenres(genresJson) {
+            genresJson.forEach(genre => {
+                Array.from(book_genres_select.options)
+                    .filter(option => parseInt(option.value) === genre.id)
+                    .forEach(option => option.selected = true)
+            })
+        }
+    </script>
+
+    <script>
+        function fillBookForm(book) {
+            let bookId = document.getElementById("book_id_input")
+            bookId.setAttribute("value", book.id)
+
+            let bookTitle = document.getElementById("book-title-input")
+            bookTitle.setAttribute("value", book.title)
+
+            setSelectedAuthor(book.author);
+            setSelectedGenres(book.genres)
+
+            document.getElementById("hidden-book-id-input").value = book.id
+        }
+    </script>
+
+    <script>
+        function getBook() {
+            const params = new URLSearchParams(document.location.search)
+            const bookId = params.get("id")
+            if (bookId != null) {
+                fetch('http://localhost:8080/library/api/book/' + bookId)
+                    .then(response => response.json())
+                    .then(json => fillBookForm(json))
+            } else {
+                document.getElementById("book-id-div").hidden = true
+                document.getElementById("book-delete-button").hidden = true
+            }
+        }
+    </script>
+
+    <script>
+       function deleteBook() {
+           let form = document.getElementById("book-delete-form")
+
+           form.addEventListener('submit', (event) => {
+               event.preventDefault()
+               let data = new FormData(form)
+               fetch('http://localhost:8080/library/api/book/' + data.get("id"), {
+                   method: 'DELETE',
+                   body: data})
+                   .then(() => alert("Book deleted success!"))
+                   .then(() => window.location = "/library/book")
+           })
+        }
+    </script>
+
+    <script>
+        function saveBook(){
+            let form = document.getElementById("book-edit-form")
+            let formData = new FormData(form);
+
+            form.addEventListener('submit', (event) => {
+                event.preventDefault();
+                let jsonData = serializeFormDataToJson(formData)
+                fetch('http://localhost:8080/library/api/book', {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: jsonData})
+                    .then(() => alert("Book added success!"))
+                    .then(() => window.location = "/library/book")
+            })
+        }
+    </script>
+
+    <script>
+        function updateBook(){
+            let form = document.getElementById("book-edit-form")
+            let formData = new FormData(form);
+
+            form.addEventListener('submit', (event) => {
+                event.preventDefault();
+                let jsonData = serializeFormDataToJson(formData)
+                fetch('http://localhost:8080/library/api/book/' + formData.get("id"), {
+                    method: 'PUT',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: jsonData})
+                    .then(() => alert("Book updated!"))
+                    .then(() => window.location = "/library/book")
+            })
+        }
+    </script>
+
+    <script>
+        function serializeFormDataToJson(formData) {
+            const jsonObject = {};
+            formData.forEach((value, key) => {
+                if (Reflect.has(jsonObject, key)) {
+                    if (!Array.isArray(jsonObject[key])) {
+                        jsonObject[key] = [jsonObject[key]];
+                    }
+                    jsonObject[key].push(value);
+                } else {
+                    jsonObject[key] = value;
+                }
+            })
+            return JSON.stringify(jsonObject);
+        }
+    </script>
+</head>
+<body onload="getBook()">
+
+<form id="book-edit-form">
     <h3>Book details:</h3>
 
-    <div class="row" th:if="*{id}">
-        <label for="book-id-input">ID:</label>
-        <input id="book-id-input" readonly="readonly" th:field="*{id}" >
+    <div id="book-id-div" class="row">
+        <label for="book_id_input">ID:</label>
+        <input id="book_id_input" readonly="readonly" name="id">
     </div>
 
     <div class="row">
         <label for="book-title-input">Title:</label>
-        <input id="book-title-input" th:field="*{title}"/>
-        <div class="errors"
-             th:if="${#fields.hasErrors('title')}"
-             th:errors="*{title}">Wrong book title error</div>
+        <input id="book-title-input" name="title" value="Enter title">
     </div>
 
     <div class="row">
         <label for="book-author-select">Author:</label>
         <select id="book-author-select" name="authorId">
             <option th:each="author : ${allAuthors}"
-                    th:selected="${book.author eq author}"
+                    th:id="${'author-select-option-' + author.id}"
                     th:value="${author.id}"
-                    th:text="${author.fullName}">Author</option>
+                    th:text="${author.fullName}">Author
+            </option>
         </select>
     </div>
 
     <div class="row">
-        <label for="book-genres-select">Genres:</label>
-        <select id="book-genres-select" name="genreIds" multiple="multiple">
+        <label for="book_genres_select">Genres:</label>
+        <select id="book_genres_select" name="genreIds" multiple="multiple">
             <option th:each="genre : ${allGenres}"
-                    th:selected="${#lists.contains(book.genres, genre)}"
                     th:value="${genre.id}"
                     th:text="${genre.name}">Genre</option>
         </select>
     </div>
 
     <div class="row">
-        <button type="submit">Save</button>
+        <button type="submit" onclick="book_id_input.value === '' ? saveBook() : updateBook()">Save</button>
         <a href="books.html" th:href="@{/book}">
             <button type="button">Cancel</button>
         </a>
     </div>
 </form>
-<form id="book-delete-form" action="book_edit.html" th:action="@{/book/delete}" th:method="post" th:object="${book}">
-    <input id="hidden=book-id-input" type="hidden" name="bookId" th:value="*{id}" value="1">
+<form id="book-delete-form" th:method="post">
+    <input id="hidden-book-id-input" type="hidden" name="id">
     <div class="row">
-        <button th:if="*{id}" type="submit">Delete</button>
+        <button id="book-delete-button" type="submit" onclick="deleteBook()">Delete</button>
     </div>
 </form>
 </body>

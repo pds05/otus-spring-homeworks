@@ -46,44 +46,62 @@
             padding-left: 30px;
         }
     </style>
+
+    <script>
+        function fillBookTable(books) {
+            let bookTable = document.getElementById("booksTable").getElementsByTagName('tbody')[0]
+
+            books.forEach(book => {
+                    let row = bookTable.insertRow();
+
+                    let titleCell = row.insertCell();
+                    titleCell.textContent = book.title;
+                    let authorCell = row.insertCell();
+                    authorCell.textContent = book.author.fullName;
+                    let genreCell = row.insertCell();
+                    genreCell.innerHTML = "<ul id='genreList_" + book.id + "'></ul>"
+                    let genreList = document.getElementById("genreList_" + book.id);
+                    book.genres.forEach(
+                        genre => genreList.innerHTML += "<li>" + genre.name + "</li>"
+                    )
+                    let editCell = row.insertCell();
+                    editCell.innerHTML = "<a href='book/edit?id=" + book.id + "'>Edit</a>";
+                    let infoCell = row.insertCell();
+                    infoCell.innerHTML = "<a href='book/" + book.id + "'>Info</a>";
+                }
+            )
+        }
+    </script>
+
+    <script>
+        function getBook() {
+            fetch('http://localhost:8080/library/api/book')
+                .then(response => response.json())
+                .then(json => fillBookTable(json));
+        }
+    </script>
 </head>
-<body>
-    <h3>Books:</h3>
+<body onload="getBook()">
+<h3>Books:</h3>
 
-    <table class="books">
-        <thead>
-        <tr>
-            <th>Title</th>
-            <th>Author</th>
-            <th>Genres</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="book : ${allBooks}">
-            <td th:text="${book.title}">Title</td>
-            <td th:text="${book.author.fullName}">Author</td>
-            <td>
-                <ul th:each="genre : ${book.genres}">
-                    <li th:text="${genre.name}">Genre</li>
-                </ul>
-            </td>
-            <td>
-                <a th:href="@{book/edit(id=${book.id})}" href="book_edit.html">Edit</a>
-            </td>
-            <td>
-                <a th:href="@{book/{id}(id=${book.id})}" href="book.html">Info</a>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-    <div class="row">
-        <a href="book_edit.html" th:href="@{/book/edit}">
-            <button type="button">Add book</button>
-        </a>
+<table id="booksTable" class="books">
+    <thead>
+    <tr>
+        <th>Title</th>
+        <th>Author</th>
+        <th>Genres</th>
+    </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+<div class="row">
+    <a href="book_edit.html" th:href="@{/book/edit}">
+        <button type="button">Add book</button>
+    </a>
 
-        <a href="index.html" th:href="@{/}">
-            <button type="button">Back</button>
-        </a>
-    </div>
+    <a href="index.html" th:href="@{/}">
+        <button type="button">Back</button>
+    </a>
+</div>
 </body>
 </html>
