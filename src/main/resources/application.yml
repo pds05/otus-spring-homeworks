@@ -1,0 +1,24 @@
+spring:
+  data:
+    mongodb:
+      database: prod_db
+      port: 27018
+      host: localhost
+server:
+  servlet:
+    context-path: /library
+logging:
+  level:
+    org:
+      springframework:
+        boot:
+          autoconfigure:
+            mongo:
+              embedded: debug
+    ru.otus.hw: debug
+    ROOT: error
+de:
+  flapdoodle:
+    mongodb:
+      embedded:
+        version: 6.0.5
