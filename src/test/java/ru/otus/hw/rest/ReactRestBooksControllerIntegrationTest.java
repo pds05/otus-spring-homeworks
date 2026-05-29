@@ -201,7 +201,7 @@ public class ReactRestBooksControllerIntegrationTest {
 
         webTestClient.delete().uri("/api/book/{id}", savedBook.getId())
                 .exchange()
-                .expectStatus().isOk();
+                .expectStatus().isNoContent();
 
         verify(bookRepository, times(1)).deleteById(savedBook.getId());
 

@@ -97,7 +97,7 @@ public class ReactRestBooksController {
     }
 
     @DeleteMapping(value = "/api/book/{id}")
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public Mono<Void> deleteBook(@PathVariable String id) {
         return bookRepository.deleteById(id);
     }

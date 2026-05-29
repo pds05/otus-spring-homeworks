@@ -181,7 +181,7 @@ public class ReactRestBooksControllerUnitTest {
 
         webTestClient.delete().uri("/api/book/{id}", "1")
                 .exchange()
-                .expectStatus().isOk();
+                .expectStatus().isNoContent();
 
         verify(bookRepository, times(1)).deleteById("1");
     }
