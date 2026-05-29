@@ -93,7 +93,7 @@
         function getBook() {
             const url = document.URL;
             const bookId = url.substring(url.lastIndexOf('/') + 1);
-            fetch('http://localhost:8080/library/api/book/' + bookId)
+            fetch('/library/api/book/' + bookId)
                 .then(response => response.json())
                 .then(json => fillBookTable(json));
         }

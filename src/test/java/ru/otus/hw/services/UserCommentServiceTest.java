@@ -31,16 +31,16 @@ public class UserCommentServiceTest {
     @Test
     @DisplayName("должен вернуть комментарий по его идентификатору")
     void shouldReturnUserCommentById() {
-        var returnedUserComment = userCommentService.findById(2);
+        var returnedUserComment = userCommentService.findById(1);
 
         assertThat(returnedUserComment).isNotNull();
-        assertThat(returnedUserComment.id()).isEqualTo(2);
+        assertThat(returnedUserComment.id()).isEqualTo(1);
     }
 
     @Test
     @DisplayName("должен вернуть все комментарии к книге")
     void shouldReturnUserCommentsByBookId() {
-        List<UserCommentDto> userCommentDtos = userCommentService.findAllByBookId(2);
+        List<UserCommentDto> userCommentDtos = userCommentService.findAllByBookId(1);
 
         assertThat(userCommentDtos).isNotEmpty().hasSize(2);
     }
@@ -59,8 +59,8 @@ public class UserCommentServiceTest {
     @Test
     @DisplayName("должен удалять комментарий по его идентификатору")
     void shouldDeleteUserComment() {
-        userCommentService.deleteById(1);
+        userCommentService.deleteById(3);
 
-        assertThrows(EntityNotFoundException.class, () -> userCommentService.findById(1));
+        assertThrows(EntityNotFoundException.class, () -> userCommentService.findById(3));
     }
 }

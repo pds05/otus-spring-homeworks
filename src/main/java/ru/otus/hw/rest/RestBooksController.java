@@ -2,10 +2,8 @@ package ru.otus.hw.rest;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -54,30 +52,33 @@ public class RestBooksController {
         return userCommentService.findAllByBookId(id);
     }
 
-    @PostMapping(value = "/api/book", consumes = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<BookDto> saveBook(@RequestBody BookFromUiDto book) {
-        var result = bookService.insert(book.getTitle(),
+    @PostMapping(value = "/api/book",
+            consumes = {MediaType.APPLICATION_JSON_VALUE},
+            produces = {MediaType.APPLICATION_JSON_VALUE})
+    @ResponseStatus(HttpStatus.CREATED)
+    public BookDto saveBook(@RequestBody BookFromUiDto book) {
+        return bookService.insert(book.getTitle(),
                 book.getAuthorId(),
-                book.getGenreIds().stream().map(Long::parseLong).collect(Collectors.toSet()));
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        return ResponseEntity.status(HttpStatus.CREATED).headers(headers).body(result);
+                book.getGenreIds().stream()
+                        .map(Long::parseLong)
+                        .collect(Collectors.toSet()));
     }
 
-    @PutMapping(value = "/api/book/{id}", consumes = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<BookDto> updateBook(@RequestBody BookFromUiDto book,
-                                              @PathVariable("id") Long bookId) {
-        var result = bookService.update(bookId,
+    @PutMapping(value = "/api/book/{id}",
+            consumes = {MediaType.APPLICATION_JSON_VALUE},
+            produces = {MediaType.APPLICATION_JSON_VALUE})
+    public BookDto updateBook(@RequestBody BookFromUiDto book,
+                              @PathVariable("id") Long bookId) {
+        return bookService.update(bookId,
                 book.getTitle(),
                 book.getAuthorId(),
-                book.getGenreIds().stream().map(Long::parseLong).collect(Collectors.toSet()));
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        return ResponseEntity.ok().headers(headers).body(result);
+                book.getGenreIds().stream()
+                        .map(Long::parseLong)
+                        .collect(Collectors.toSet()));
     }
 
     @DeleteMapping(value = "/api/book/{id}")
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteBook(@PathVariable Long id) {
         bookService.deleteById(id);
     }

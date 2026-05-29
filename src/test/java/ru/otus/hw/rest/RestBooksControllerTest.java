@@ -1,18 +1,13 @@
 package ru.otus.hw.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import net.minidev.json.JSONArray;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import ru.otus.hw.dtos.*;
 import ru.otus.hw.services.AuthorService;
 import ru.otus.hw.services.BookServiceImpl;
@@ -22,8 +17,13 @@ import ru.otus.hw.services.UserCommentService;
 import java.util.List;
 import java.util.Set;
 
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.anyLong;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.anySet;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.times;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -126,7 +126,7 @@ public class RestBooksControllerTest {
     @Test
     void shouldDeleteBookById() throws Exception {
         mvc.perform(delete("/api/book/{id}", 1))
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
         verify(bookService, times(1)).deleteById(1L);
     }
 }
