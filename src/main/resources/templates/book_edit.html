@@ -85,7 +85,7 @@
             const params = new URLSearchParams(document.location.search)
             const bookId = params.get("id")
             if (bookId != null) {
-                fetch('http://localhost:8080/library/api/book/' + bookId)
+                fetch('/library/api/book/' + bookId)
                     .then(response => response.json())
                     .then(json => fillBookForm(json))
             } else {
@@ -102,7 +102,7 @@
            form.addEventListener('submit', (event) => {
                event.preventDefault()
                let data = new FormData(form)
-               fetch('http://localhost:8080/library/api/book/' + data.get("id"), {
+               fetch('/library/api/book/' + data.get("id"), {
                    method: 'DELETE',
                    body: data})
                    .then(() => alert("Book deleted success!"))
@@ -119,7 +119,7 @@
             form.addEventListener('submit', (event) => {
                 event.preventDefault();
                 let jsonData = serializeFormDataToJson(formData)
-                fetch('http://localhost:8080/library/api/book', {
+                fetch('/library/api/book', {
                     method: 'POST',
                     headers: {
                         'Accept': 'application/json',
@@ -140,7 +140,7 @@
             form.addEventListener('submit', (event) => {
                 event.preventDefault();
                 let jsonData = serializeFormDataToJson(formData)
-                fetch('http://localhost:8080/library/api/book/' + formData.get("id"), {
+                fetch('/library/api/book/' + formData.get("id"), {
                     method: 'PUT',
                     headers: {
                         'Accept': 'application/json',

@@ -103,7 +103,7 @@
         function getUserComments() {
             const url = document.URL;
             const bookId = url.substring(url.lastIndexOf('/') + 1);
-            fetch('http://localhost:8080/library/api/book/' + bookId + '/user_comment')
+            fetch('/library/api/book/' + bookId + '/user_comment')
                 .then(response => response.json())
                 .then(json => drawUserComments(json));
         }

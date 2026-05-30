@@ -75,7 +75,7 @@
 
     <script>
         function getBook() {
-            fetch('http://localhost:8080/library/api/book')
+            fetch('/library/api/book')
                 .then(response => response.json())
                 .then(json => fillBookTable(json));
         }
