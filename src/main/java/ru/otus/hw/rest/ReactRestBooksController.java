@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.function.Tuple2;
 import ru.otus.hw.dtos.BookDto;
 import ru.otus.hw.dtos.BookFromUiDto;
 import ru.otus.hw.dtos.UserCommentDto;
@@ -65,9 +66,15 @@ public class ReactRestBooksController {
             produces = {MediaType.APPLICATION_JSON_VALUE})
     @ResponseStatus(HttpStatus.CREATED)
     public Mono<BookDto> saveBook(@RequestBody BookFromUiDto bookDto) {
-        return bookRepository.insert(BookFromUiDto.toDomainObject(bookDto))
-                .map(BookDto::fromDomainObject);
+        Mono<Author> authorMono = authorRepository.findById(bookDto.getAuthorId());
+        Mono<List<Genre>> genresMono = genreRepository.findAllByIdIn(new HashSet<>(bookDto.getGenreIds())).collectList();
 
+        return Mono.zip(authorMono, genresMono).zipWhen((tuple2) -> {
+            Book book = BookFromUiDto.toDomainObject(bookDto);
+            book.setAuthor(tuple2.getT1());
+            book.setGenres(tuple2.getT2());
+            return bookRepository.insert(book);
+        }).map(Tuple2::getT2).map(BookDto::fromDomainObject);
     }
 
     @PutMapping(value = "/api/book/{id}",
@@ -93,12 +100,12 @@ public class ReactRestBooksController {
 
                     return bookRepository.save(book);
                 })
-                .map(tuple2 -> BookDto.fromDomainObject(tuple2.getT2()));
+                .map(Tuple2::getT2).map(BookDto::fromDomainObject);
     }
 
     @DeleteMapping(value = "/api/book/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public Mono<Void> deleteBook(@PathVariable String id) {
-        return bookRepository.deleteById(id);
+        return bookRepository.deleteById(id).doOnSuccess(boid -> userCommentRepository.deleteAllByBookId(id));
     }
 }

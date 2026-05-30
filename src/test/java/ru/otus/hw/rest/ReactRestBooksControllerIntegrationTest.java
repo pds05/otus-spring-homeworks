@@ -9,7 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
-import ru.otus.hw.DataInitializer;
+import ru.otus.hw.data.DataInitializer;
 import ru.otus.hw.dtos.BookDto;
 import ru.otus.hw.dtos.BookFromUiDto;
 import ru.otus.hw.models.Author;
@@ -31,16 +31,16 @@ public class ReactRestBooksControllerIntegrationTest {
     private WebTestClient webTestClient;
 
     @MockitoSpyBean
-    BookRepository bookRepository;
+    private BookRepository bookRepository;
 
     @MockitoSpyBean
-    UserCommentRepository userCommentRepository;
+    private UserCommentRepository userCommentRepository;
 
     @MockitoSpyBean
-    AuthorRepository authorRepository;
+    private AuthorRepository authorRepository;
 
     @MockitoSpyBean
-    GenreRepository genreRepository;
+    private GenreRepository genreRepository;
 
     @BeforeEach
     void waitFillDb() throws InterruptedException {
@@ -134,8 +134,11 @@ public class ReactRestBooksControllerIntegrationTest {
                 .jsonPath("$.id").isNotEmpty()
                 .jsonPath("$.title").isEqualTo(book.getTitle())
                 .jsonPath("$.genres[0].id").isEqualTo(book.getGenreIds().get(0))
+                .jsonPath("$.genres[0].name").isEqualTo(genres.get(0).getName())
                 .jsonPath("$.genres[1].id").isEqualTo(book.getGenreIds().get(1))
-                .jsonPath("$.author.id").isEqualTo(book.getAuthorId());
+                .jsonPath("$.genres[1].name").isEqualTo(genres.get(1).getName())
+                .jsonPath("$.author.id").isEqualTo(book.getAuthorId())
+                .jsonPath("$.author.fullName").isEqualTo(author.getFullName());
 
         verify(bookRepository, times(1)).insert(any(Book.class));
     }
@@ -204,8 +207,14 @@ public class ReactRestBooksControllerIntegrationTest {
                 .expectStatus().isNoContent();
 
         verify(bookRepository, times(1)).deleteById(savedBook.getId());
+        verify(userCommentRepository, times(1)).deleteAllByBookId(savedBook.getId());
 
-        bookRepository.findById(savedBook.getId()).hasElement()
+        bookRepository.findById(savedBook.getId())
+                .hasElement()
+                .subscribe(Assertions::assertFalse);
+
+        userCommentRepository.findAllByBookId(savedBook.getId())
+                .hasElements()
                 .subscribe(Assertions::assertFalse);
     }
 }

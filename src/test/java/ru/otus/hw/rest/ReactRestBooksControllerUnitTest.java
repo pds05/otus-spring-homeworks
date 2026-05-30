@@ -122,7 +122,12 @@ public class ReactRestBooksControllerUnitTest {
         Book savingBook = new Book(null, savedBook.getTitle(), savedBook.getAuthor(), savedBook.getGenres());
         BookFromUiDto bookFromUiDto = BookFromUiDto.fromDomainObject(savingBook);
 
-        when(bookRepository.insert(any(Book.class))).thenReturn(Mono.just(savedBook));
+        when(bookRepository.insert(any(Book.class)))
+                .thenReturn(Mono.just(savedBook));
+        when(authorRepository.findById(savingBook.getAuthor().getId()))
+                .thenReturn(Mono.just(savedBook.getAuthor()));
+        when(genreRepository.findAllByIdIn(savingBook.getGenres().stream().map(Genre::getId).collect(Collectors.toSet())))
+                .thenReturn(Flux.fromIterable(savedBook.getGenres()));
 
         WebTestClient.ResponseSpec response = webTestClient.post()
                 .uri("/api/book")
@@ -169,8 +174,12 @@ public class ReactRestBooksControllerUnitTest {
                 .jsonPath("$.id").isEqualTo(bookDto.getId())
                 .jsonPath("$.title").isEqualTo(bookDto.getTitle())
                 .jsonPath("$.genres[0].id").isEqualTo(bookDto.getGenreIds().get(0))
+                .jsonPath("$.genres[0].name").isEqualTo(book.getGenres().get(0).getName())
                 .jsonPath("$.genres[1].id").isEqualTo(bookDto.getGenreIds().get(1))
-                .jsonPath("$.author.id").isEqualTo(bookDto.getAuthorId());
+                .jsonPath("$.genres[1].name").isEqualTo(book.getGenres().get(1).getName())
+                .jsonPath("$.author.id").isEqualTo(bookDto.getAuthorId())
+                .jsonPath("$.author.fullName").isEqualTo("Author 2");
+
 
         verify(bookRepository, times(1)).save(any(Book.class));
     }
@@ -184,6 +193,7 @@ public class ReactRestBooksControllerUnitTest {
                 .expectStatus().isNoContent();
 
         verify(bookRepository, times(1)).deleteById("1");
+        verify(userCommentRepository, times(1)).deleteAllByBookId("1");
     }
 
     private Book createBook() {
