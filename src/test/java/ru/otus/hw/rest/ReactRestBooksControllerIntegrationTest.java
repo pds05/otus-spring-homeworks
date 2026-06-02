@@ -19,6 +19,7 @@ import ru.otus.hw.repositories.AuthorRepository;
 import ru.otus.hw.repositories.BookRepository;
 import ru.otus.hw.repositories.GenreRepository;
 import ru.otus.hw.repositories.UserCommentRepository;
+import ru.otus.hw.services.BookServiceReactive;
 
 import java.util.List;
 
@@ -42,6 +43,9 @@ public class ReactRestBooksControllerIntegrationTest {
     @MockitoSpyBean
     private GenreRepository genreRepository;
 
+    @MockitoSpyBean
+    private BookServiceReactive bookService;
+
     @BeforeEach
     void waitFillDb() throws InterruptedException {
         bookRepository.findById(String.valueOf(DataInitializer.BOOK_COUNT))
@@ -52,7 +56,7 @@ public class ReactRestBooksControllerIntegrationTest {
     @Test
     void shouldReturnBooks() throws Exception {
         WebTestClient.ResponseSpec response = webTestClient.get()
-                .uri("/api/book")
+                .uri("/api/v2/book")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange();
         response.expectStatus().isOk()
@@ -78,7 +82,7 @@ public class ReactRestBooksControllerIntegrationTest {
         assert savedBook != null;
 
         WebTestClient.ResponseSpec response = webTestClient.get()
-                .uri("/api/book/{id}", savedBook.getId())
+                .uri("/api/v2/book/{id}", savedBook.getId())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange();
         response.expectStatus().isOk()
@@ -98,7 +102,7 @@ public class ReactRestBooksControllerIntegrationTest {
         assert book != null;
 
         WebTestClient.ResponseSpec response = webTestClient.get()
-                .uri("/api/book/{id}/user_comment", book.getId())
+                .uri("/api/v2/book/{id}/user_comment", book.getId())
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange();
         response.expectStatus().isOk()
@@ -124,7 +128,7 @@ public class ReactRestBooksControllerIntegrationTest {
                 List.of(genres.get(0).getId(), genres.get(1).getId()));
 
         WebTestClient.ResponseSpec response = webTestClient.post()
-                .uri("/api/book")
+                .uri("/api/v2/book")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .body(Mono.just(book), BookFromUiDto.class)
@@ -140,7 +144,7 @@ public class ReactRestBooksControllerIntegrationTest {
                 .jsonPath("$.author.id").isEqualTo(book.getAuthorId())
                 .jsonPath("$.author.fullName").isEqualTo(author.getFullName());
 
-        verify(bookRepository, times(1)).insert(any(Book.class));
+        verify(bookService, times(1)).insertReactive(anyString(), anyString(), anySet());
     }
 
     @Test
@@ -168,7 +172,7 @@ public class ReactRestBooksControllerIntegrationTest {
         bookDto.setAuthorId(authors.get(1).getId());
 
         WebTestClient.ResponseSpec response = webTestClient.put()
-                .uri("/api/book/{id}", savedBook.getId())
+                .uri("/api/v2/book/{id}", savedBook.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .body(Mono.just(bookDto), BookFromUiDto.class)
@@ -202,11 +206,11 @@ public class ReactRestBooksControllerIntegrationTest {
         Book savedBook = bookRepository.insert(book).block();
         assert savedBook != null;
 
-        webTestClient.delete().uri("/api/book/{id}", savedBook.getId())
+        webTestClient.delete().uri("/api/v2/book/{id}", savedBook.getId())
                 .exchange()
                 .expectStatus().isNoContent();
 
-        verify(bookRepository, times(1)).deleteById(savedBook.getId());
+        verify(bookService, times(1)).deleteByIdReactive(savedBook.getId());
         verify(userCommentRepository, times(1)).deleteAllByBookId(savedBook.getId());
 
         bookRepository.findById(savedBook.getId())

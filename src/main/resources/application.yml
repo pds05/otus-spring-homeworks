@@ -15,7 +15,7 @@ logging:
           autoconfigure:
             mongo:
               embedded: debug
-    ru.otus.hw: debug
+    ru.otus.hw: info
     ROOT: error
 de:
   flapdoodle:

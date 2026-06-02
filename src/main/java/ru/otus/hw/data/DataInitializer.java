@@ -18,7 +18,7 @@ import ru.otus.hw.repositories.BookRepository;
 import ru.otus.hw.repositories.GenreRepository;
 import ru.otus.hw.repositories.UserCommentRepository;
 
-import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -49,93 +49,59 @@ public class DataInitializer implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        genreRepository.saveAll(generateGenres(GENRE_COUNT))
-                .publishOn(Schedulers.boundedElastic())
-                .doOnComplete(() -> {
-                    log.info("All genres saved");
-                    authorRepository.saveAll(generateAuthors(AUTHOR_COUNT))
-                            .publishOn(Schedulers.boundedElastic())
-                            .doOnComplete(() -> {
-                                log.info("All authors saved");
-                                bookRepository.saveAll(generateBooks(BOOK_COUNT))
-                                        .publishOn(Schedulers.boundedElastic())
-                                        .doOnNext(book -> {
-                                            log.info("Book saved: {}", book);
-                                            userCommentRepository.saveAll(generateUserComments(USER_COMMENT_PER_BOOKS, book.getId()))
-                                                    .doOnComplete(() -> log.info("All user comment saved for book: {}", book.getTitle()))
-                                                    .subscribe(saved -> log.info("Saved user comment: {}", saved));
-                                        })
-                                        .doOnComplete(() -> log.info("All books saved"))
-                                        .subscribe(saved -> log.info("Saved book: {}", saved));
-                            })
-                            .subscribe(saved -> log.info("Saved author: {}", saved));
+        Flux<Genre> genreFlux = genreRepository.saveAll(generateGenres(GENRE_COUNT));
+        log.debug("All genres saved");
+        Flux<Author> authorFlux = authorRepository.saveAll(generateAuthors(AUTHOR_COUNT));
+        log.debug("All authors saved");
+        Flux<Book> bookFlux = bookRepository.saveAll(generateBooks(genreFlux.collectList().block(),
+                authorFlux.collectList().block(), BOOK_COUNT));
 
+        bookFlux.publishOn(Schedulers.boundedElastic())
+                .doOnNext(book -> {
+                    log.debug("Book saved: {}", book);
+                    userCommentRepository.saveAll(generateUserComments(USER_COMMENT_PER_BOOKS, book.getId()))
+                            .doOnComplete(() -> log.debug("All user comment saved for book: {}", book.getTitle()))
+                            .subscribe(saved -> log.debug("Saved user comment: {}", saved));
                 })
-                .subscribe(savedGenre -> log.info("Saved genre: {}", savedGenre));
+                .doOnComplete(() -> log.debug("All books saved"))
+                .subscribe(saved -> log.debug("Saved book: {}", saved));
     }
 
-    private Flux<Genre> generateGenres(int count) {
-        return Flux.generate(() -> 1, (state, sink) -> {
-                    Genre genre = new Genre(null, String.format("Genre_%d", state++));
-                    sink.next(genre);
-                    if (state > count) {
-                        sink.complete();
-                    }
-                    return state;
-                })
-                .cast(Genre.class)
-                .doOnNext(genre -> log.info("Produced genre: {}", genre))
-                .delayElements(Duration.ofMillis(100));
+    private List<Genre> generateGenres(int count) {
+        List<Genre> genreList = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            genreList.add(new Genre(null, String.format("Genre_%d", i)));
+        }
+        return genreList;
     }
 
-    private Flux<Author> generateAuthors(int count) {
-        return Flux.generate(() -> 1, (state, sink) -> {
-                    Author author = new Author(null, String.format("Author_%d", state++));
-                    sink.next(author);
-                    if (state > count) {
-                        sink.complete();
-                    }
-                    return state;
-                })
-                .cast(Author.class)
-                .doOnNext(author -> log.info("Produced author: {}", author))
-                .delayElements(Duration.ofMillis(100));
+    private List<Author> generateAuthors(int count) {
+        List<Author> authorList = new ArrayList<>();
+        for (int i = 1; i < count + 1; i++) {
+            authorList.add(new Author(null, String.format("Author_%d", i)));
+        }
+        return authorList;
     }
 
-    private Flux<Book> generateBooks(int count) {
+    private List<Book> generateBooks(List<Genre> genres, List<Author> authors, int count) {
         Random random = new Random();
-
-        List<Author> authors = authorRepository.findAll().collectList().block();
-        List<Genre> genres = genreRepository.findAll().collectList().block();
-
-        return Flux.generate(() -> 1, (state, sink) -> {
-                    Book book = new Book(IS_BOOK_AUTOGENERATE_ID ? null : state.toString(),
-                            String.format("Book_Title_%d", state),
-                            authors.get(random.nextInt(AUTHOR_COUNT)),
-                            List.of(genres.get(random.nextInt(GENRE_COUNT)),
-                                    genres.get(random.nextInt(GENRE_COUNT)))
-                            );
-                    sink.next(book);
-                    if (state == count) {
-                        sink.complete();
-                    }
-                    return ++state;
-                })
-                .cast(Book.class)
-                .doOnNext(book -> log.info("Produced book: {}", book))
-                .delayElements(Duration.ofMillis(100));
+        List<Book> bookList = new ArrayList<>();
+        for (int i = 1; i < count + 1; i++) {
+            Book book = new Book(IS_BOOK_AUTOGENERATE_ID ? null : String.valueOf(i), String.format("Book_Title_%d", i),
+                    authors.get(random.nextInt(AUTHOR_COUNT)),
+                    List.of(genres.get(random.nextInt(GENRE_COUNT)),
+                            genres.get(random.nextInt(GENRE_COUNT)))
+            );
+            bookList.add(book);
+        }
+        return bookList;
     }
 
-    private Flux<UserComment> generateUserComments(int count, String bookId) {
-        return Flux.generate(() -> 1, (state, sink) -> {
-            UserComment userComment = new UserComment(null, "Text_Comment_" + state , bookId);
-            sink.next(userComment);
-            if (state == count) {
-                sink.complete();
-            }
-            return ++state;
-        })
-                .cast(UserComment.class)
-                .doOnNext(uc -> log.info("Produced user comment: {}", uc));
+    private List<UserComment> generateUserComments(int count, String bookId) {
+        List<UserComment> userCommentList = new ArrayList<>();
+        for (int i = 1; i < count + 1; i++) {
+            userCommentList.add(new UserComment(null, "Text_Comment_" + i, bookId));
+        }
+        return userCommentList;
     }
 }
