@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Study library</title>
+    <style>
+        h1 {
+            padding: 2px;
+            padding-left: 30px;
+        }
+
+        ul {
+            width: 120px;
+            padding-left: 25px;
+        }
+    </style>
+</head>
+<body>
+<div th:insert="home :: auth"></div>
+
+    <h1>Study library:</h1>
+
+    <ul>
+        <li><a href="books.html" th:href="@{book}">View books page</a></li>
+        <li><a href="authors.html" th:href="@{author}">View authors page</a></li>
+        <li><a href="genres.html" th:href="@{genre}">View genres page</a></li>
+    </ul>
+
+    <a th:href="@{/logout}">
+        <button type="button">Logout</button>
+    </a>
+</body>
+</html>

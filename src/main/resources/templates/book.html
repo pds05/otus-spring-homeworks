@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit book</title>
+    <style type="text/css">
+        body {
+            padding: 50px;
+        }
+
+        label {
+            display: inline-block;
+            width: 100px;
+        }
+
+        h3 {
+            padding: 2px;
+            padding-left: 30px;
+        }
+
+        .row {
+            margin-top: 10px;
+        }
+
+        .book {
+            border: 1px solid steelblue;
+            width: 300px;
+            border-collapse: collapse;
+        }
+
+        .book tr td, th {
+            padding: 5px;
+            border: 1px solid steelblue;
+        }
+
+        .book td:last-child, td:first-child {
+            width: 50px;
+        }
+
+        ul {
+            width: 80px;
+            padding-left: 25px;
+        }
+    </style>
+
+    <script>
+        function fillBookTable(book) {
+            let bookTable = document.getElementById("bookTable").getElementsByTagName('tbody')[0]
+            let row = bookTable.insertRow();
+            let idCell = row.insertCell();
+            idCell.textContent = book.id;
+            let titleCell = row.insertCell();
+            titleCell.textContent = book.title;
+            let authorCell = row.insertCell();
+            authorCell.textContent = book.author.fullName;
+            let genreCell = row.insertCell();
+            genreCell.innerHTML = "<ul id='genreList'></ul>"
+            let genreList = document.getElementById("genreList");
+            book.genres.forEach(
+                genre => genreList.innerHTML += "<li>" + genre.name + "</li>"
+            )
+            let editCell = row.insertCell();
+            editCell.innerHTML = "<a href='edit?id=" + book.id + "'>Edit</a>";
+        }
+    </script>
+
+    <script>
+        function drawUserComments(userComments) {
+            if (userComments.length > 0) {
+                let container = document.createElement('div');
+                container.setAttribute("class", "row")
+
+                let h = document.createElement('h3');
+                h.textContent = "User comments:";
+                container.appendChild(h);
+
+                let list = document.createElement('ul');
+                list.setAttribute("id", "userComments")
+                container.appendChild(list);
+
+                document.getElementsByTagName("body").item(0).appendChild(container);
+
+                let ucList = document.getElementById("userComments");
+                userComments.forEach(
+                    comment => {ucList.innerHTML += "<li>" + comment.text + "</li>"}
+                )
+
+            }
+        }
+    </script>
+
+    <script>
+        function getBook() {
+            const url = document.URL;
+            const bookId = url.substring(url.lastIndexOf('/') + 1);
+            fetch('/library/api/book/' + bookId)
+                .then(response => response.json())
+                .then(json => fillBookTable(json));
+        }
+    </script>
+
+    <script>
+        function getUserComments() {
+            const url = document.URL;
+            const bookId = url.substring(url.lastIndexOf('/') + 1);
+            fetch('/library/api/book/' + bookId + '/user_comment')
+                .then(response => response.json())
+                .then(json => drawUserComments(json));
+        }
+    </script>
+</head>
+<body onload="getBook(); getUserComments()">
+<h3>Book info:</h3>
+<div>
+    <table id="bookTable" class="book">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Genres</th>
+        </tr>
+        </thead>
+
+        <tbody></tbody>
+    </table>
+</div>
+
+<div class="row">
+    <a href="books.html" th:href="@{/book}">
+        <button type="button">View books</button>
+    </a>
+</div>
+
+</body>
+</html>
