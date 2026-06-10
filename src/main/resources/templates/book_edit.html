@@ -55,12 +55,18 @@
         }
     </script>
 
-    <script>
+    <script th:inline="javascript" type="text/javascript">
+        // ....
+
+        var genres = /*[[${allGenres}]]*/ [];
+
         function setSelectedGenres(genresJson) {
+
             genresJson.forEach(genre => {
-                Array.from(book_genres_select.options)
-                    .filter(option => parseInt(option.value) === genre.id)
-                    .forEach(option => option.selected = true)
+                if (genres.find(g => g.id === genre.id)) {
+                    let option = document.getElementById("genre-select-option-" + genre.id);
+                    option.selected = true
+                }
             })
         }
     </script>
@@ -73,7 +79,7 @@
             let bookTitle = document.getElementById("book-title-input")
             bookTitle.setAttribute("value", book.title)
 
-            setSelectedAuthor(book.author);
+            setSelectedAuthor(book.author)
             setSelectedGenres(book.genres)
 
             document.getElementById("hidden-book-id-input").value = book.id
@@ -200,6 +206,7 @@
         <label for="book_genres_select">Genres:</label>
         <select id="book_genres_select" name="genreIds" multiple="multiple">
             <option th:each="genre : ${allGenres}"
+                    th:id="${'genre-select-option-' + genre.id}"
                     th:value="${genre.id}"
                     th:text="${genre.name}">Genre</option>
         </select>

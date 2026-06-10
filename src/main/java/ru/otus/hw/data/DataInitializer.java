@@ -36,14 +36,19 @@ public class DataInitializer implements ApplicationRunner {
 
     public static final int USER_COMMENT_PER_BOOKS = 5;
 
+    public static final int GENRES_PER_BOOK = 3;
+
     public static final boolean IS_BOOK_AUTOGENERATE_ID = false;
 
     @Autowired
     private AuthorRepository authorRepository;
+
     @Autowired
     private BookRepository bookRepository;
+
     @Autowired
     private GenreRepository genreRepository;
+
     @Autowired
     private UserCommentRepository userCommentRepository;
 
@@ -69,7 +74,7 @@ public class DataInitializer implements ApplicationRunner {
 
     private List<Genre> generateGenres(int count) {
         List<Genre> genreList = new ArrayList<>();
-        for (int i = 0; i < count; i++) {
+        for (int i = 1; i < count + 1; i++) {
             genreList.add(new Genre(null, String.format("Genre_%d", i)));
         }
         return genreList;
@@ -87,10 +92,17 @@ public class DataInitializer implements ApplicationRunner {
         Random random = new Random();
         List<Book> bookList = new ArrayList<>();
         for (int i = 1; i < count + 1; i++) {
+            List<Genre> genreList = new ArrayList<>();
+            for (int j = 0; j < GENRES_PER_BOOK; j++) {
+                Genre genre;
+                do  {
+                    genre = genres.get(random.nextInt(GENRE_COUNT));
+                } while (genreList.contains(genre));
+                genreList.add(genre);
+            }
             Book book = new Book(IS_BOOK_AUTOGENERATE_ID ? null : String.valueOf(i), String.format("Book_Title_%d", i),
                     authors.get(random.nextInt(AUTHOR_COUNT)),
-                    List.of(genres.get(random.nextInt(GENRE_COUNT)),
-                            genres.get(random.nextInt(GENRE_COUNT)))
+                    genreList
             );
             bookList.add(book);
         }

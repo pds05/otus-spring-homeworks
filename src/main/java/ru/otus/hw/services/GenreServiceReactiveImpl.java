@@ -7,26 +7,15 @@ import reactor.core.publisher.Flux;
 import ru.otus.hw.dtos.GenreDto;
 import ru.otus.hw.repositories.GenreRepository;
 
-import java.util.List;
-
 @RequiredArgsConstructor
-@Service("genreService")
+@Service
 public class GenreServiceReactiveImpl implements GenreServiceReactive {
 
     private final GenreRepository genreRepository;
 
     @Transactional(readOnly = true)
     @Override
-    public List<GenreDto> findAll() {
-        return genreRepository.findAll()
-                .map(GenreDto::fromDomainObject)
-                .collectList()
-                .block();
-    }
-
-    @Transactional(readOnly = true)
-    @Override
-    public Flux<GenreDto> findAllReactive() {
+    public Flux<GenreDto> findAll() {
         return genreRepository.findAll().map(GenreDto::fromDomainObject);
     }
 }

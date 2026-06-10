@@ -27,26 +27,26 @@ import java.util.HashSet;
 @Slf4j
 public class ReactRestBooksController {
 
-    private final BookServiceReactive bookService;
+    private final BookServiceReactive bookServiceReactive;
 
-    private final UserCommentServiceReactive userCommentService;
+    private final UserCommentServiceReactive userCommentServiceReactive;
 
     @GetMapping(value = "/api/v2/book")
     @ResponseStatus(HttpStatus.OK)
     public Flux<BookDto> getAllBooks() {
-        return bookService.findAllReactive();
+        return bookServiceReactive.findAll();
     }
 
     @GetMapping("/api/v2/book/{id}")
     @ResponseStatus(HttpStatus.OK)
     public Mono<BookDto> getBook(@PathVariable String id) {
-        return bookService.findByIdReactive(id);
+        return bookServiceReactive.findById(id);
     }
 
     @GetMapping("/api/v2/book/{id}/user_comment")
     @ResponseStatus(HttpStatus.OK)
     public Flux<UserCommentDto> getUserComments(@PathVariable String id) {
-        return userCommentService.findAllByBookIdReactive(id);
+        return userCommentServiceReactive.findAllByBookId(id);
     }
 
     @PostMapping(value = "/api/v2/book",
@@ -54,7 +54,7 @@ public class ReactRestBooksController {
             produces = {MediaType.APPLICATION_JSON_VALUE})
     @ResponseStatus(HttpStatus.CREATED)
     public Mono<BookDto> saveBook(@RequestBody BookFromUiDto bookDto) {
-        return bookService.insertReactive(bookDto.getTitle(),
+        return bookServiceReactive.insert(bookDto.getTitle(),
                 bookDto.getAuthorId(),
                 new HashSet<>(bookDto.getGenreIds()));
     }
@@ -65,7 +65,7 @@ public class ReactRestBooksController {
     public Mono<BookDto> updateBook(@RequestBody BookFromUiDto bookDto,
                                     @PathVariable("id") String bookId) {
 
-        return bookService.updateReactive(bookId,
+        return bookServiceReactive.update(bookId,
                 bookDto.getTitle(),
                 bookDto.getAuthorId(),
                 new HashSet<>(bookDto.getGenreIds()));
@@ -74,6 +74,6 @@ public class ReactRestBooksController {
     @DeleteMapping(value = "/api/v2/book/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public Mono<Void> deleteBook(@PathVariable String id) {
-        return bookService.deleteByIdReactive(id);
+        return bookServiceReactive.deleteById(id);
     }
 }

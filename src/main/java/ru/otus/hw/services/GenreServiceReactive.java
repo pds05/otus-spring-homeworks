@@ -3,8 +3,8 @@ package ru.otus.hw.services;
 import reactor.core.publisher.Flux;
 import ru.otus.hw.dtos.GenreDto;
 
-public interface GenreServiceReactive extends GenreService {
+public interface GenreServiceReactive {
 
-    Flux<GenreDto> findAllReactive();
+    Flux<GenreDto> findAll();
 
 }

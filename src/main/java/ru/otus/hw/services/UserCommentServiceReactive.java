@@ -4,17 +4,17 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import ru.otus.hw.dtos.UserCommentDto;
 
-public interface UserCommentServiceReactive extends UserCommentService {
+public interface UserCommentServiceReactive {
 
-    Mono<UserCommentDto> findByIdReactive(String id);
+    Mono<UserCommentDto> findById(String id);
 
-    Flux<UserCommentDto> findAllByBookIdReactive(String bookId);
+    Flux<UserCommentDto> findAllByBookId(String bookId);
 
-    Mono<UserCommentDto> insertReactive(String text, String bookId);
+    Mono<UserCommentDto> insert(String text, String bookId);
 
-    Mono<UserCommentDto> updateReactive(String id, String text);
+    Mono<UserCommentDto> update(String id, String text);
 
-    Mono<Void> deleteByIdReactive(String id);
+    Mono<Void> deleteById(String id);
 
-    Mono<Void> deleteAllByBookIdReactive(String bookId);
+    Mono<Void> deleteAllByBookId(String bookId);
 }

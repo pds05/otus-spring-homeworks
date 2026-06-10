@@ -1,4 +1,8 @@
 spring:
+  thymeleaf:
+    reactive:
+      max-chunk-size: 8192
+    cache: false
   data:
     mongodb:
       database: prod_db

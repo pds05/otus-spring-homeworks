@@ -44,7 +44,7 @@ public class ReactRestBooksControllerIntegrationTest {
     private GenreRepository genreRepository;
 
     @MockitoSpyBean
-    private BookServiceReactive bookService;
+    private BookServiceReactive bookServiceReactive;
 
     @BeforeEach
     void waitFillDb() throws InterruptedException {
@@ -144,7 +144,7 @@ public class ReactRestBooksControllerIntegrationTest {
                 .jsonPath("$.author.id").isEqualTo(book.getAuthorId())
                 .jsonPath("$.author.fullName").isEqualTo(author.getFullName());
 
-        verify(bookService, times(1)).insertReactive(anyString(), anyString(), anySet());
+        verify(bookServiceReactive, times(1)).insert(anyString(), anyString(), anySet());
     }
 
     @Test
@@ -210,7 +210,7 @@ public class ReactRestBooksControllerIntegrationTest {
                 .exchange()
                 .expectStatus().isNoContent();
 
-        verify(bookService, times(1)).deleteByIdReactive(savedBook.getId());
+        verify(bookServiceReactive, times(1)).deleteById(savedBook.getId());
         verify(userCommentRepository, times(1)).deleteAllByBookId(savedBook.getId());
 
         bookRepository.findById(savedBook.getId())

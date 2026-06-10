@@ -18,12 +18,11 @@ import ru.otus.hw.repositories.UserCommentRepository;
 
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static org.springframework.util.CollectionUtils.isEmpty;
 
 @RequiredArgsConstructor
-@Service("bookService")
+@Service
 public class BookServiceReactiveImpl implements BookServiceReactive {
     private final AuthorRepository authorRepository;
 
@@ -35,73 +34,33 @@ public class BookServiceReactiveImpl implements BookServiceReactive {
 
     @Transactional(readOnly = true)
     @Override
-    public BookDto findById (long id) {
-        return bookRepository.findById(String.valueOf(id))
-                .map(BookDto::fromDomainObject)
-                .blockOptional()
-                .orElseThrow(() -> new EntityNotFoundException("Book id %d not found".formatted(id)));
-    }
-
-    @Transactional(readOnly = true)
-    @Override
-    public List<BookDto> findAll () {
-        return bookRepository.findAll()
-                .map(BookDto::fromDomainObject).collectList().block();
-    }
-
-    @Transactional
-    @Override
-    public BookDto insert(String title, long authorId, Set<Long> genresIds) {
-        Mono<BookDto> bookDtoMono = save(null, title, String.valueOf(authorId),
-                genresIds.stream().map(String::valueOf).collect(Collectors.toSet()));
-        return bookDtoMono.block();
-    }
-
-    @Transactional
-    @Override
-    public BookDto update(long id, String title, long authorId, Set<Long> genresIds) {
-        Mono<BookDto> bookDtoMono = save(String.valueOf(id),
-                title,
-                String.valueOf(authorId),
-                genresIds.stream().map(String::valueOf).collect(Collectors.toSet()));
-        return bookDtoMono.block();
-    }
-
-    @Transactional
-    @Override
-    public void deleteById(long id) {
-        bookRepository.deleteById(String.valueOf(id));
-    }
-
-    @Transactional(readOnly = true)
-    @Override
-    public Mono<BookDto> findByIdReactive(String id) {
+    public Mono<BookDto> findById(String id) {
         return bookRepository.findById(id).map(BookDto::fromDomainObject);
     }
 
     @Transactional(readOnly = true)
     @Override
-    public Flux<BookDto> findAllReactive() {
+    public Flux<BookDto> findAll() {
         return bookRepository.findAll().map(BookDto::fromDomainObject);
     }
 
     @Transactional
     @Override
-    public Mono<BookDto> insertReactive(String title, String authorId, Set<String> genresIds) {
+    public Mono<BookDto> insert(String title, String authorId, Set<String> genresIds) {
         return save(null, title, authorId, genresIds);
     }
 
     @Transactional
     @Override
-    public Mono<BookDto> updateReactive(String id, String title, String authorId, Set<String> genresIds) {
+    public Mono<BookDto> update(String id, String title, String authorId, Set<String> genresIds) {
         return save(id, title, authorId, genresIds);
     }
 
     @Transactional
     @Override
-    public Mono<Void> deleteByIdReactive(String id) {
+    public Mono<Void> deleteById(String id) {
         return bookRepository.deleteById(id)
-                .then(Mono.defer(() -> userCommentRepository.deleteAllByBookId(id)));
+                .then(userCommentRepository.deleteAllByBookId(id));
     }
 
     public Mono<BookDto> save(String id, String title, String authorId, Set<String> genresIds) {
@@ -109,13 +68,16 @@ public class BookServiceReactiveImpl implements BookServiceReactive {
             throw new IllegalArgumentException("Genres ids must not be null");
         }
         var authorMono = authorRepository.findById(authorId);
-        var genresMono = genreRepository.findAllByIdIn(genresIds).collectList();
+        Mono<List<Genre>> genresMono = genreRepository.findAllByIdIn(genresIds).collectList().flatMap(genreList -> {
+            if (isEmpty(genreList) || genresIds.size() != genreList.size()) {
+                return Mono.error(new EntityNotFoundException("One or all genres with ids %s not found".formatted(genresIds)));
+            } else {
+                return Mono.just(genreList);
+            }
+        });
         return Mono.zip(authorMono, genresMono).zipWhen(tuple2 -> {
             Author author = tuple2.getT1();
             List<Genre> genres = tuple2.getT2();
-            if (isEmpty(genres) || genresIds.size() != genres.size()) {
-                throw new EntityNotFoundException("One or all genres with ids %s not found".formatted(genresIds));
-            }
             var book = new Book(id, title, author, genres);
             return bookRepository.save(book);
         }).map(Tuple2::getT2).map(BookDto::fromDomainObject);

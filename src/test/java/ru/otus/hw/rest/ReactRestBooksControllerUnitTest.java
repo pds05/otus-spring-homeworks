@@ -25,9 +25,9 @@ public class ReactRestBooksControllerUnitTest {
     @Autowired
     private WebTestClient webTestClient;
     @MockitoBean
-    private BookServiceReactive bookService;
+    private BookServiceReactive bookServiceReactive;
     @MockitoBean
-    private UserCommentServiceReactive userCommentService;
+    private UserCommentServiceReactive userCommentServiceReactive;
 
     private final List<BookDto> books = List.of(
             new BookDto("1",
@@ -51,7 +51,7 @@ public class ReactRestBooksControllerUnitTest {
 
     @Test
     void shouldReturnBooks() throws Exception {
-        when(bookService.findAllReactive()).thenReturn(Flux.fromIterable(books));
+        when(bookServiceReactive.findAll()).thenReturn(Flux.fromIterable(books));
 
         WebTestClient.ResponseSpec response = webTestClient.get()
                 .uri("/api/v2/book")
@@ -61,7 +61,7 @@ public class ReactRestBooksControllerUnitTest {
                 .expectBodyList(BookDto.class)
                 .hasSize(books.size());
 
-        verify(bookService, times(1)).findAllReactive();
+        verify(bookServiceReactive, times(1)).findAll();
     }
 
     @Test
@@ -69,7 +69,7 @@ public class ReactRestBooksControllerUnitTest {
         Book book = createBook();
         BookDto bookDto = BookDto.fromDomainObject(book);
 
-        when(bookService.findByIdReactive("1")).thenReturn(Mono.just(bookDto));
+        when(bookServiceReactive.findById("1")).thenReturn(Mono.just(bookDto));
 
         WebTestClient.ResponseSpec response = webTestClient.get()
                 .uri("/api/v2/book/{id}", book.getId())
@@ -83,7 +83,7 @@ public class ReactRestBooksControllerUnitTest {
                 .jsonPath("$.genres[1].id").isEqualTo(book.getGenres().get(1).getId())
                 .jsonPath("$.author.id").isEqualTo(book.getAuthor().getId());
 
-        verify(bookService, times(1)).findByIdReactive(book.getId());
+        verify(bookServiceReactive, times(1)).findById(book.getId());
     }
 
     @Test
@@ -93,7 +93,7 @@ public class ReactRestBooksControllerUnitTest {
                 new UserComment("2", "Text 2", "1")
         );
         List<UserCommentDto> userCommentDtos = userComments.stream().map(UserCommentDto::fromDomainObject).toList();
-        when(userCommentService.findAllByBookIdReactive("1")).thenReturn(Flux.fromIterable(userCommentDtos));
+        when(userCommentServiceReactive.findAllByBookId("1")).thenReturn(Flux.fromIterable(userCommentDtos));
 
         WebTestClient.ResponseSpec response = webTestClient.get()
                 .uri("/api/v2/book/{id}/user_comment", "1")
@@ -103,7 +103,7 @@ public class ReactRestBooksControllerUnitTest {
                 .expectBodyList(UserCommentDto.class)
                 .hasSize(2);
 
-        verify(userCommentService, times(1)).findAllByBookIdReactive("1");
+        verify(userCommentServiceReactive, times(1)).findAllByBookId("1");
     }
 
     @Test
@@ -114,7 +114,7 @@ public class ReactRestBooksControllerUnitTest {
         Book savingBook = new Book(null, savedBook.getTitle(), savedBook.getAuthor(), savedBook.getGenres());
         BookFromUiDto bookFromUiDto = BookFromUiDto.fromDomainObject(savingBook);
 
-        when(bookService.insertReactive(anyString(), anyString(), anySet()))
+        when(bookServiceReactive.insert(anyString(), anyString(), anySet()))
                 .thenReturn(Mono.just(savedBookDto));
 
         WebTestClient.ResponseSpec response = webTestClient.post()
@@ -131,7 +131,7 @@ public class ReactRestBooksControllerUnitTest {
                 .jsonPath("$.genres[1].id").isEqualTo(savedBook.getGenres().get(1).getId())
                 .jsonPath("$.author.id").isEqualTo(savedBook.getAuthor().getId());
 
-        verify(bookService, times(1)).insertReactive(anyString(), anyString(), anySet());
+        verify(bookServiceReactive, times(1)).insert(anyString(), anyString(), anySet());
     }
 
     @Test
@@ -144,7 +144,7 @@ public class ReactRestBooksControllerUnitTest {
         BookDto bookDto = BookDto.fromDomainObject(updatingBook);
         BookFromUiDto bookFromUiDto = BookFromUiDto.fromDomainObject(updatingBook);
 
-        when(bookService.updateReactive(anyString(),anyString(), anyString(), anySet())).thenReturn(Mono.just(bookDto));
+        when(bookServiceReactive.update(anyString(),anyString(), anyString(), anySet())).thenReturn(Mono.just(bookDto));
 
         WebTestClient.ResponseSpec response = webTestClient.put()
                 .uri("/api/v2/book/{id}", bookFromUiDto.getId())
@@ -163,18 +163,18 @@ public class ReactRestBooksControllerUnitTest {
                 .jsonPath("$.author.id").isEqualTo(updatingBook.getAuthor().getId())
                 .jsonPath("$.author.fullName").isEqualTo(updatingBook.getAuthor().getFullName());
 
-        verify(bookService, times(1)).updateReactive(anyString(), anyString(), anyString(), anySet());
+        verify(bookServiceReactive, times(1)).update(anyString(), anyString(), anyString(), anySet());
     }
 
     @Test
     void shouldDeleteBookById() throws Exception {
-        when(bookService.deleteByIdReactive("1")).thenReturn(Mono.empty());
+        when(bookServiceReactive.deleteById("1")).thenReturn(Mono.empty());
 
         webTestClient.delete().uri("/api/v2/book/{id}", "1")
                 .exchange()
                 .expectStatus().isNoContent();
 
-        verify(bookService, times(1)).deleteByIdReactive("1");
+        verify(bookServiceReactive, times(1)).deleteById("1");
     }
 
     private Book createBook() {
