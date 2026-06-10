@@ -3,6 +3,7 @@ package ru.otus.hw.rest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -17,7 +18,6 @@ import ru.otus.hw.services.UserCommentService;
 import java.util.List;
 import java.util.Set;
 
-
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.anyLong;
 import static org.mockito.Mockito.anyString;
@@ -30,7 +30,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(controllers = RestBooksController.class)
+@WebMvcTest(controllers = RestBooksController.class,
+        excludeAutoConfiguration = SecurityAutoConfiguration.class)
 public class RestBooksControllerTest {
 
     @Autowired
