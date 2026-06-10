@@ -1,0 +1,11 @@
+spring:
+  data:
+    mongodb:
+      database: test_db
+      port: 27018
+      host: localhost
+de:
+  flapdoodle:
+    mongodb:
+      embedded:
+        version: 6.0.5
