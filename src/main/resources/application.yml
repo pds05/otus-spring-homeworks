@@ -1,0 +1,29 @@
+spring:
+  thymeleaf:
+    mode: HTML5
+  jpa:
+    open-in-view: false
+    generate-ddl: false
+    hibernate:
+      ddl-auto: none
+    database-platform: org.hibernate.dialect.H2Dialect
+    show-sql: true
+  datasource:
+    url: jdbc:h2:mem:maindb
+    driverClassName: org.h2.Driver
+    username: dbuser
+    password: dbpass
+  sql:
+    init:
+      mode: always
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+server:
+  servlet:
+    context-path: /library
+logging:
+  level:
+    ROOT: error
+    ru.otus.hw: debug
