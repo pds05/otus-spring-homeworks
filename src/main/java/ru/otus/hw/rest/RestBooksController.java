@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,8 +36,6 @@ public class RestBooksController {
         return bookService.findAll();
     }
 
-    //FIXME рекомендовано авторизовать на уровне метода в сервисе. Тест проходит только с авторизацией в контроллере
-    @Secured("ROLE_USER")
     @GetMapping("/api/book/{id}")
     @ResponseStatus(HttpStatus.OK)
     public BookDto getBook(@PathVariable Long id) {
@@ -55,7 +52,6 @@ public class RestBooksController {
         return userCommentService.findAllByBookId(id);
     }
 
-    @Secured("ROLE_EDITOR")
     @PostMapping(value = "/api/book",
             consumes = {MediaType.APPLICATION_JSON_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE})
@@ -68,7 +64,6 @@ public class RestBooksController {
                         .collect(Collectors.toSet()));
     }
 
-    @Secured("ROLE_EDITOR")
     @PutMapping(value = "/api/book/{id}",
             consumes = {MediaType.APPLICATION_JSON_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE})
@@ -82,7 +77,6 @@ public class RestBooksController {
                         .collect(Collectors.toSet()));
     }
 
-    @Secured("ROLE_EDITOR")
     @DeleteMapping(value = "/api/book/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteBook(@PathVariable Long id) {

@@ -25,12 +25,6 @@ public class BookServiceImpl implements BookService {
 
     private final BookRepository bookRepository;
 
-    //FIXME Рекомендовано использовать @Secured("ROLE_USER"),
-    // но падает тест webmvc - авторизация в сервисе не работает с моком сервиса
-    // Так же падает SpringBootTest сервиса с ошибкой AuthenticationCredentialsNotFoundException:
-    // An Authentication object was not found in the SecurityContext
-    // Применение в тесте настройки @EnableAutoConfiguration(exclude = {SecurityAutoConfiguration.class})
-    // проблему не решает
     @Transactional(readOnly = true)
     @Override
     public BookDto findById(long id) {
@@ -47,21 +41,18 @@ public class BookServiceImpl implements BookService {
                 .toList();
     }
 
-    //FIXME    @Secured("ROLE_EDITOR")
     @Transactional
     @Override
     public BookDto insert(String title, long authorId, Set<Long> genresIds) {
         return save(0, title, authorId, genresIds);
     }
 
-    //FIXME    @Secured("ROLE_EDITOR")
     @Transactional
     @Override
     public BookDto update(long id, String title, long authorId, Set<Long> genresIds) {
         return save(id, title, authorId, genresIds);
     }
 
-    //FIXME    @Secured("ROLE_EDITOR")
     @Transactional
     @Override
     public void deleteById(long id) {

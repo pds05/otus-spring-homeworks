@@ -17,10 +17,3 @@ insert into user_comments(text, book_id)
 values ('BookComment_1_1', 1), ('BookComment_1_2', 1),
        ('BookComment_2_1', 2), ('BookComment_2_2', 2),
        ('BookComment_3_1', 3);
-
-insert into users(username, password)
-values ('user', 'pass123'), ('editor', 'pass123');
-
-insert into user_roles (username, user_role)
-values ('user', 'ROLE_USER'),
-       ('editor', 'ROLE_EDITOR');

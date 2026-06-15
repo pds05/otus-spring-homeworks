@@ -20,7 +20,6 @@ public class UserCommentServiceImpl implements UserCommentService {
 
     private final BookRepository bookRepository;
 
-    //FIXME    @Secured("ROLE_USER")
     @Transactional(readOnly = true)
     @Override
     public UserCommentDto findById(long id) {
@@ -29,7 +28,6 @@ public class UserCommentServiceImpl implements UserCommentService {
                 .orElseThrow(() -> new EntityNotFoundException("User comment id %d not found".formatted(id)));
     }
 
-    //FIXME     @Secured("ROLE_USER")
     @Transactional(readOnly = true)
     @Override
     public List<UserCommentDto> findAllByBookId(long bookId) {
@@ -38,7 +36,6 @@ public class UserCommentServiceImpl implements UserCommentService {
                 .toList();
     }
 
-    //FIXME     @Secured("ROLE_USER")
     @Transactional
     @Override
     public UserCommentDto insert(String text, long bookId) {
@@ -52,7 +49,6 @@ public class UserCommentServiceImpl implements UserCommentService {
         return UserCommentDto.fromDomainObject(savedUserComment);
     }
 
-    //FIXME     @Secured("ROLE_USER")
     @Transactional
     @Override
     public UserCommentDto update(long id, String text) {
@@ -64,7 +60,6 @@ public class UserCommentServiceImpl implements UserCommentService {
         return UserCommentDto.fromDomainObject(userComment);
     }
 
-    //FIXME     @Secured("ROLE_USER")
     @Transactional
     @Override
     public void deleteById(long id) {

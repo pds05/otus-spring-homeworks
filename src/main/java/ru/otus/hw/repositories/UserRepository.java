@@ -6,6 +6,6 @@ import ru.otus.hw.models.User;
 
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    @EntityGraph("user-role-entity-graph")
+    @EntityGraph("user-authorities-entity-graph")
     User findByUsername(String username);
 }
