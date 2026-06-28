@@ -19,7 +19,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class UserCommentDoc {
 
     @Id
-    private long id;
+    private String id;
 
     private String text;
 

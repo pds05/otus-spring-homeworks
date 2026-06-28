@@ -4,10 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.ItemReadListener;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionListener;
-import org.springframework.batch.core.ItemReadListener;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.repository.JobRepository;
@@ -53,7 +53,8 @@ public class AuthorJobConfig {
     @Bean
     public Step transformAuthorStep(AuthorReader authorReader,
                                     AuthorDocWriter authorDocWriter,
-                                    AuthorProcessor authorProcessor) {
+                                    AuthorProcessor authorProcessor,
+                                    CustomItemWriteListener<AuthorDoc> customItemWriteListener) {
         return new StepBuilder("transformAuthorStep", jobRepository)
                 .<Author, AuthorDoc>chunk(CHUNK_SIZE, platformTransactionManager)
                 .reader(authorReader)
@@ -69,6 +70,7 @@ public class AuthorJobConfig {
                         log.error("Error reading author", e);
                     }
                 })
+                .listener(customItemWriteListener)
                 .build();
     }
 }

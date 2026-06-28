@@ -4,10 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.ItemReadListener;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionListener;
-import org.springframework.batch.core.ItemReadListener;
+import org.springframework.batch.core.ItemProcessListener;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.repository.JobRepository;
@@ -43,30 +44,41 @@ public class BookJobConfig {
                         log.info("Start migration book job");
                     }
 
+                    @Override
                     public void afterJob(@NonNull JobExecution jobExecution) {
                         log.info("End migration book job");
                     }
+
                 }).build();
     }
 
     @Bean
     public Step transformBookStep(BookReader bookReader,
                                   BookDocWriter bookDocWriter,
-                                  BookProcessor bookProcessor) {
+                                  BookProcessor bookProcessor,
+                                  CustomItemWriteListener<BookDoc> customItemWriteListener) {
         return new StepBuilder("transformBookStep", jobRepository)
                 .<Book, BookDoc>chunk(CHUNK_SIZE, platformTransactionManager)
                 .reader(bookReader)
                 .processor(bookProcessor)
                 .writer(bookDocWriter)
                 .listener(new ItemReadListener<>() {
-
+                    @Override
                     public void afterRead(@NonNull Book book) {
                         log.info("Book read: {}", book);
                     }
 
+                    @Override
                     public void onReadError(Exception e) {
                         log.error("Error reading book", e);
                     }
-                }).build();
+                })
+                .listener(new ItemProcessListener<>() {
+                    @Override
+                    public void onProcessError(Book item, Exception e) {
+                        log.error("Error processing book: {}", e.getMessage());
+                    }
+                })
+                .listener(customItemWriteListener).build();
     }
 }

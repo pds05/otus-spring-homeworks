@@ -7,8 +7,10 @@ import ru.otus.hw.models.mongo.GenreDoc;
 
 @Component
 public class GenreProcessor implements ItemProcessor<Genre, GenreDoc> {
+
+
     @Override
     public GenreDoc process(Genre item) throws Exception {
-        return new GenreDoc(item.getId(), item.toString());
+        return new GenreDoc(null, item.getName());
     }
 }

@@ -13,6 +13,7 @@ spring:
       host: localhost
       port: 27018
       database: migrate_db
+      auto-index-creation: true
   shell:
     interactive:
       enabled: true
@@ -46,6 +47,6 @@ logging:
     org.springframework.boot.autoconfigure.mongo.embedded: DEBUG
     org.springframework.jdbc.core.JdbcTemplate: INFO
     org.hibernate.SQL: INFO
-    ru.otus.hw.config.batch: DEBUG
+    ru.otus.hw.batch: DEBUG
     ru.otus.hw: INFO
 de.flapdoodle.mongodb.embedded.version: 6.0.5

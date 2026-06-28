@@ -4,10 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.ItemReadListener;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionListener;
-import org.springframework.batch.core.ItemReadListener;
+import org.springframework.batch.core.ItemProcessListener;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.repository.JobRepository;
@@ -46,13 +47,15 @@ public class UserCommentJobConfig {
                     public void afterJob(@NonNull JobExecution jobExecution) {
                         log.info("End migration user comment job");
                     }
-                }).build();
+                })
+                .build();
     }
 
     @Bean
     public Step transformUserCommentStep(UserCommentReader userCommentReader,
                                          UserCommentDocWriter userCommentDocWriter,
-                                         UserCommentProcessor userCommentProcessor) {
+                                         UserCommentProcessor userCommentProcessor,
+                                         CustomItemWriteListener<UserCommentDoc> customItemWriteListener) {
         return new StepBuilder("transformUserCommentStep", jobRepository)
                 .<UserComment, UserCommentDoc>chunk(CHUNK_SIZE, platformTransactionManager)
                 .reader(userCommentReader)
@@ -67,6 +70,14 @@ public class UserCommentJobConfig {
                     public void onReadError(Exception e) {
                         log.error("Error reading userComment", e);
                     }
-                }).build();
+                })
+                .listener(new ItemProcessListener<>() {
+                    @Override
+                    public void onProcessError(UserComment item, Exception e) {
+                        log.error("Error processing user comment: {}", e.getMessage());
+                    }
+                })
+                .listener(customItemWriteListener)
+                .build();
     }
 }
