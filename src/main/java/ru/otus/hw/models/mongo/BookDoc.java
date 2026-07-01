@@ -9,8 +9,10 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
+import ru.otus.hw.models.Book;
 
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @Getter
@@ -19,7 +21,7 @@ import java.util.List;
 @NoArgsConstructor
 
 @Document(collection = "book_docs")
-public class BookDoc {
+public class BookDoc implements MongoDoc {
 
     @Id
     private String id;
@@ -33,4 +35,15 @@ public class BookDoc {
     @DBRef(lazy = true)
     private List<GenreDoc> genreDocs;
 
+    @Override
+    public String buildId() {
+        return UUID.nameUUIDFromBytes(this.getClass().getName().concat(getTitle()).getBytes()).toString();
+    }
+
+    public static BookDoc fromBook(Book book) {
+        return new BookDoc(null,
+                book.getTitle(),
+                AuthorDoc.fromAuthor(book.getAuthor()),
+                book.getGenres().stream().map(GenreDoc::fromGenre).toList());
+    }
 }

@@ -54,7 +54,7 @@ public class AuthorJobConfig {
     public Step transformAuthorStep(AuthorReader authorReader,
                                     AuthorDocWriter authorDocWriter,
                                     AuthorProcessor authorProcessor,
-                                    CustomItemWriteListener<AuthorDoc> customItemWriteListener) {
+                                    MongoDocItemWriteListener mongoDocItemWriteListener) {
         return new StepBuilder("transformAuthorStep", jobRepository)
                 .<Author, AuthorDoc>chunk(CHUNK_SIZE, platformTransactionManager)
                 .reader(authorReader)
@@ -70,7 +70,7 @@ public class AuthorJobConfig {
                         log.error("Error reading author", e);
                     }
                 })
-                .listener(customItemWriteListener)
+                .listener(mongoDocItemWriteListener)
                 .build();
     }
 }

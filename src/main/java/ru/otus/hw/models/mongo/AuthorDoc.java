@@ -8,6 +8,9 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+import ru.otus.hw.models.Author;
+
+import java.util.UUID;
 
 @Data
 @Getter
@@ -16,7 +19,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @NoArgsConstructor
 
 @Document(collection = "author_docs")
-public class AuthorDoc {
+public class AuthorDoc implements MongoDoc {
 
     @Id
     private String id;
@@ -24,4 +27,12 @@ public class AuthorDoc {
     @Indexed(unique = true)
     private String fullName;
 
+    @Override
+    public String buildId() {
+        return UUID.nameUUIDFromBytes(this.getClass().getName().concat(getFullName()).getBytes()).toString();
+    }
+
+    public static AuthorDoc fromAuthor(Author author) {
+        return new AuthorDoc(null, author.getFullName());
+    }
 }

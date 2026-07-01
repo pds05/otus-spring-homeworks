@@ -52,7 +52,8 @@ public class GenreJobConfig {
     @Bean
     public Step transformGenreStep(GenreReader genreReader,
                                    GenreDocWriter genreDocWriter,
-                                   GenreProcessor genreProcessor) {
+                                   GenreProcessor genreProcessor,
+                                   MongoDocItemWriteListener mongoDocItemWriteListener) {
         return new StepBuilder("transformGenreStep", jobRepository)
                 .<Genre, GenreDoc>chunk(CHUNK_SIZE, platformTransactionManager)
                 .reader(genreReader)
@@ -67,6 +68,8 @@ public class GenreJobConfig {
                     public void onReadError(Exception e) {
                         log.error("Error reading genre", e);
                     }
-                }).build();
+                })
+                .listener(mongoDocItemWriteListener)
+                .build();
     }
 }

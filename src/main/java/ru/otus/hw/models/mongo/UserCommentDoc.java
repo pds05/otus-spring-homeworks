@@ -8,6 +8,9 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
+import ru.otus.hw.models.UserComment;
+
+import java.util.UUID;
 
 @Data
 @Getter
@@ -16,7 +19,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @NoArgsConstructor
 
 @Document(collection = "user_comment_docs")
-public class UserCommentDoc {
+public class UserCommentDoc implements MongoDoc {
 
     @Id
     private String id;
@@ -26,4 +29,12 @@ public class UserCommentDoc {
     @DBRef(lazy = true)
     private BookDoc book;
 
+    @Override
+    public String buildId() {
+        return UUID.nameUUIDFromBytes(this.getClass().getName().concat(getText()).getBytes()).toString();
+    }
+
+    public static UserCommentDoc fromUserComment(UserComment userComment) {
+        return new UserCommentDoc(null, userComment.getText(), BookDoc.fromBook(userComment.getBook()));
+    }
 }

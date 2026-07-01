@@ -56,7 +56,7 @@ public class BookJobConfig {
     public Step transformBookStep(BookReader bookReader,
                                   BookDocWriter bookDocWriter,
                                   BookProcessor bookProcessor,
-                                  CustomItemWriteListener<BookDoc> customItemWriteListener) {
+                                  MongoDocItemWriteListener mongoDocItemWriteListener) {
         return new StepBuilder("transformBookStep", jobRepository)
                 .<Book, BookDoc>chunk(CHUNK_SIZE, platformTransactionManager)
                 .reader(bookReader)
@@ -78,7 +78,7 @@ public class BookJobConfig {
                     public void onProcessError(Book item, Exception e) {
                         log.error("Error processing book: {}", e.getMessage());
                     }
-                })
-                .listener(customItemWriteListener).build();
+                }).listener(mongoDocItemWriteListener)
+                .build();
     }
 }
