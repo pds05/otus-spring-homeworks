@@ -55,7 +55,7 @@ public class UserCommentJobConfig {
     public Step transformUserCommentStep(UserCommentReader userCommentReader,
                                          UserCommentDocWriter userCommentDocWriter,
                                          UserCommentProcessor userCommentProcessor,
-                                         UserCommentDocItemWriteListener userCommentDocItemWriteListener) {
+                                         MongoDocItemWriteListener mongoDocItemWriteListener) {
         return new StepBuilder("transformUserCommentStep", jobRepository)
                 .<UserComment, UserCommentDoc>chunk(CHUNK_SIZE, platformTransactionManager)
                 .reader(userCommentReader)
@@ -77,7 +77,7 @@ public class UserCommentJobConfig {
                         log.error("Error processing user comment: {}", e.getMessage());
                     }
                 })
-                .listener(userCommentDocItemWriteListener)
+                .listener(mongoDocItemWriteListener)
                 .build();
     }
 }

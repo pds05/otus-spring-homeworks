@@ -1,6 +1,7 @@
 package ru.otus.hw.batch.processors;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.stereotype.Component;
@@ -8,25 +9,29 @@ import ru.otus.hw.models.Book;
 import ru.otus.hw.models.mongo.AuthorDoc;
 import ru.otus.hw.models.mongo.BookDoc;
 import ru.otus.hw.models.mongo.GenreDoc;
-import ru.otus.hw.models.mongo.MongoDoc;
 import ru.otus.hw.repositories.mongo.AuthorDocRepository;
 import ru.otus.hw.repositories.mongo.GenreDocRepository;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
-import java.util.UUID;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 @Slf4j
+@Getter
 @Component
 @AllArgsConstructor
 public class BookProcessor implements ItemProcessor<Book, BookDoc> {
+
+    private final Map<String, BookDoc> bookDocCache = new HashMap<>();
 
     private AuthorDocRepository authorDocRepository;
 
     private GenreDocRepository genreDocRepository;
 
-    private Map<UUID, MongoDoc> mongoCache;
+    private AuthorProcessor authorProcessor;
+
+    private GenreProcessor genreProcessor;
 
     @Override
     public BookDoc process(Book item) throws Exception {
@@ -34,8 +39,7 @@ public class BookProcessor implements ItemProcessor<Book, BookDoc> {
         bookDoc.setId(null);
         bookDoc.setTitle(item.getTitle());
 
-        UUID authorId = UUID.fromString(AuthorDoc.fromAuthor(item.getAuthor()).buildId());
-        AuthorDoc authorDoc = (AuthorDoc) mongoCache.get(authorId);
+        AuthorDoc authorDoc = authorProcessor.getAuthorDocCache().get(AuthorDoc.fromAuthor(item.getAuthor()).getId());
         if (authorDoc == null) {
             log.debug("Author document is not in the cache, trying to request database, " +
                     "authorFullName={}", item.getAuthor().getFullName());
@@ -47,9 +51,10 @@ public class BookProcessor implements ItemProcessor<Book, BookDoc> {
         List<GenreDoc> cachedGenreList = new ArrayList<>();
 
         item.getGenres().forEach(genre -> {
-            UUID genreId = UUID.fromString(GenreDoc.fromGenre(genre).buildId());
-            if (mongoCache.containsKey(genreId)) {
-                cachedGenreList.add((GenreDoc) mongoCache.get(genreId));
+
+            String genreDocId = GenreDoc.fromGenre(genre).getId();
+            if (genreProcessor.getGenreDocCache().containsKey(genreDocId)) {
+                cachedGenreList.add(genreProcessor.getGenreDocCache().get(genreDocId));
             }
         });
 
@@ -65,6 +70,8 @@ public class BookProcessor implements ItemProcessor<Book, BookDoc> {
         }
 
         bookDoc.setGenreDocs(cachedGenreList);
+
+        bookDocCache.put(bookDoc.getId(), bookDoc);
         return bookDoc;
     }
 }

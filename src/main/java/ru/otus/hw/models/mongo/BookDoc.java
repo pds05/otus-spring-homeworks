@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
@@ -41,7 +42,7 @@ public class BookDoc implements MongoDoc {
     }
 
     public static BookDoc fromBook(Book book) {
-        return new BookDoc(null,
+        return new BookDoc(ObjectId.get().toString(),
                 book.getTitle(),
                 AuthorDoc.fromAuthor(book.getAuthor()),
                 book.getGenres().stream().map(GenreDoc::fromGenre).toList());

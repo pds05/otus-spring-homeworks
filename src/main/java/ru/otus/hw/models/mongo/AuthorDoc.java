@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -33,6 +34,7 @@ public class AuthorDoc implements MongoDoc {
     }
 
     public static AuthorDoc fromAuthor(Author author) {
-        return new AuthorDoc(null, author.getFullName());
+        return new AuthorDoc(ObjectId.get().toString(), author.getFullName());
+//        return new AuthorDoc(null, author.getFullName());
     }
 }
