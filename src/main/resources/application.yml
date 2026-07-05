@@ -1,0 +1,52 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: none
+    database-platform: org.hibernate.dialect.H2Dialect
+    show-sql: false
+  #    defer-datasource-initialization: true
+  datasource:
+    url: jdbc:h2:mem:maindb
+    driverClassName: org.h2.Driver
+  data:
+    mongodb:
+      host: localhost
+      port: 27018
+      database: migrate_db
+      auto-index-creation: true
+  shell:
+    interactive:
+      enabled: true
+    noninteractive:
+        enabled: false
+    command:
+      stacktrace:
+        enabled: true
+      version:
+        enabled: false
+  sql:
+    init:
+      mode: always
+      data-locations: data.sql
+      schema-locations: schema.sql
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  batch:
+    job:
+      enabled: false
+    jdbc:
+      initialize-schema: always
+logging:
+  charset:
+    console: UTF-8
+  level:
+    root: ERROR
+    Batch: INFO
+    org.springframework.boot.autoconfigure.mongo.embedded: DEBUG
+    org.springframework.jdbc.core.JdbcTemplate: INFO
+    org.hibernate.SQL: INFO
+    ru.otus.hw.batch: DEBUG
+    ru.otus.hw: INFO
+de.flapdoodle.mongodb.embedded.version: 6.0.5
